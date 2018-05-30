@@ -26,10 +26,15 @@ class App extends Component {
     }
   }
 
+  handleSubmit = (e) => {
+    e.preventDefault()
+    console.log(e.target.value)
+  }
+
   render() {
     return (
       <div className="App">
-        <AccountsForm accountId ={this.state.account[0].id} balance={this.state.account[0].balance} name={this.state.account[0].name} type={this.state.account[0].type} subType={this.state.account[0].subType} date={this.state.account[0].date} />
+        <AccountsForm handleSubmit={this.handleSubmit} accountId ={this.state.account[0].id} balance={this.state.account[0].balance} name={this.state.account[0].name} type={this.state.account[0].type} subType={this.state.account[0].subType} date={this.state.account[0].date} />
       </div>
     );
   }
