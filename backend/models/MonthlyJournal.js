@@ -10,7 +10,7 @@ const monthlyJournalSchema = new Schema({
         type: Date,
         required: true
     },
-    timeStamp: Date.now
+    timeStamp: Date
 })
 
 const MonthlyJournalModel = mongoose.model('MonthlyJournal', monthlyJournalSchema)

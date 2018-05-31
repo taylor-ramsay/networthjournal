@@ -7,6 +7,7 @@ const accountSchema = new Schema({
         required: true
     },
     name: {
+        unique: true,
         type: String,
         required: true
     },
@@ -22,7 +23,7 @@ const accountSchema = new Schema({
         type: Date,
         required: true
     },
-    timeStamp: Date.now
+    timeStamp: Date
 })
 
 const AccountModel = mongoose.model('Account', accountSchema)

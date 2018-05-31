@@ -1,16 +1,20 @@
 import React, { Component } from 'react'
 import './App.css'
-import AccountsForm from './components/AccountsForm'
+import { Switch, Link, Route } from 'react-router-dom'
 import moment from 'moment'
+import AddAccountForm from './components/AddAccountForm'
+import EditAccountForm from './components/EditAccountForm'
+import AccountsList from './components/AccountsList'
+import axios from 'axios'
 
 class App extends Component {
 
-  constructor(){
+  constructor() {
     super()
     this.state = {
-      currentAccount: "",
-      account: [{
-        id: null,
+      currentAccount: "test",
+      accounts: [{
+        _id: null,
         balance: 0,
         name: "",
         type: "",
@@ -26,15 +30,48 @@ class App extends Component {
     }
   }
 
-  handleSubmit = (e) => {
-    e.preventDefault()
-    console.log(e.target.value)
+  componentDidMount() {
+    axios.get('http://localhost:8080/get-accounts')
+      .then(result => {
+        let accountsFromServer = result.data
+        console.log(accountsFromServer)
+        this.setState({
+          accounts: accountsFromServer
+        })
+      })
+  }
+
+  editButtonHandler = (id) => {
+    this.setState({
+      currentAccount: id
+    })
+  }
+
+  getCurrentAccount = () => {
+    console.log(this.state.currentAccount)
+    let accountFound = this.state.accounts.find((el)=>{
+      return el._id === this.state.currentAccount 
+    })
+    console.log(accountFound)
   }
 
   render() {
     return (
-      <div className="App">
-        <AccountsForm handleSubmit={this.handleSubmit} accountId ={this.state.account[0].id} balance={this.state.account[0].balance} name={this.state.account[0].name} type={this.state.account[0].type} subType={this.state.account[0].subType} date={this.state.account[0].date} />
+      <div className="container">
+      <Switch>
+        <div className="row">
+          <div className="col s8">
+          <Route path="/" render={()=>{return <AccountsList accounts={this.state.accounts} editButtonHandler={this.editButtonHandler} />}} />
+            
+          </div>
+          <div className="col s4">
+            
+              <Route path="/add-account" render={() => { return <AddAccountForm /> }} />
+              <Route path="/edit-account" render={() => { return <EditAccountForm currentAccount={this.state.currentAccount} getCurrentAccount={this.getCurrentAccount} /> }} />
+            
+          </div>
+        </div>
+        </Switch>
       </div>
     );
   }

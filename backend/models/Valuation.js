@@ -16,7 +16,7 @@ const valuationSchema = new Schema({
         type: Date,
         required: true
     },
-    timeStamp: Date.now,
+    timeStamp: Date
 })
 
 const ValuationModel = mongoose.model('Valuation', valuationSchema)

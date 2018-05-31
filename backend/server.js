@@ -29,7 +29,9 @@ const Valuation = require('./models/Valuation')
 
 //Create new account
 app.post('/add-account', (req,res)=>{
+    console.log("endpoint hit!")
     let newAccount = Account(req.body)
+    console.log(newAccount)
     newAccount.save()
         .then(savedAccount=>{
             res.json(savedAccount)
@@ -37,6 +39,40 @@ app.post('/add-account', (req,res)=>{
         .catch(error=>{
             console.log(error)
         })
+})
+
+//Get all accounts
+app.get('/get-accounts', (req,res)=>{
+    Account.find({})
+    .then(results=>{
+        res.json(results)
+    })
+    .catch(error=>{
+        console.log(error)
+    })
+})
+
+//update account
+app.put('/edit-account/:accountId', (req, res)=>{
+    console.log(req.body)
+    __object = req.body
+    let accountToUpdate = {"_id":req.params.accountId}
+    let update = {
+        type: __object.type,
+        subType: __object.subtype,
+        name: __object.name,
+        balance: __object.value,
+        date: __object.date,
+        timeStamp: __object.date
+    }
+    Account.findOneAndUpdate(accountToUpdate, update, { new:true, runValidators:true })
+    .then(updatedAccount => {
+        res.json(updatedAccount)
+    })
+    .catch(error => {
+        console.log(error)
+        res.status(400).json({error})
+    })
 })
 
 //Port 8080

@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import moment from 'moment'
+import axios from 'axios'
 
-class AccountsForm extends Component {
+class EditAccountForm extends Component {
 
     constructor(){
         super()
@@ -9,9 +10,15 @@ class AccountsForm extends Component {
             type: "",
             subtype: "",
             name: "",
-            value: 0,
-            date: ""
+            value: null,
+            date: moment().format("MMM DD, YYYY"),
+            timeStamp: moment().format("MMM DD, YYYY")
         }
+    }
+
+    componentDidMount(){
+        console.log(this.props.currentAccount)
+        //this.props.getCurrentAccount()
     }
 
     handleTypeChange = (e) => {
@@ -36,16 +43,31 @@ class AccountsForm extends Component {
 
     handleSubmit = (e) => {
         e.preventDefault()
-        console.log(this.state.type)
-        console.log(this.state.subtype)
-        console.log(this.state.name)
-        console.log(this.state.value)
-        console.log(this.state.date)
+        let formSubmissionValues = {
+            type: this.state.type,
+            subType: this.state.subtype,
+            name: this.state.name,
+            balance: this.state.value,
+            date: this.state.date,
+            timeStamp: this.state.timeStamp
+        }
+        axios.put('http://localhost:8080/edit-account/'+this.props.currentAccount, formSubmissionValues)
+        .then(result=>{
+        })
+        .catch(error=>{
+            console.log(error)
+        })
     }
 
     render() {
         return (
-            <div>
+            <div onClick={this.handleDateChange}>
+                                    <div className="row">
+                            <div className="input-field col s12">
+                                <input value={this.state.name} placeholder="Enter name" id="account_name" type="text" className="validate" onChange={this.handleNameChange} />
+                                <label htmlFor="account_name">Name of Account</label>
+                            </div>
+                        </div>
                 <div className="row">
                     <form onSubmit={this.handleSubmit} className="col s12">
                         <div className="row">
@@ -75,12 +97,6 @@ class AccountsForm extends Component {
                         </div>
                         <div className="row">
                             <div className="input-field col s12">
-                                <input value={this.state.name} placeholder="Enter name" id="account_name" type="text" className="validate" onChange={this.handleNameChange} />
-                                <label htmlFor="account_name">Name of Account</label>
-                            </div>
-                        </div>
-                        <div className="row">
-                            <div className="input-field col s12">
                                 <input value={this.state.value} placeholder="Enter $ value" id="account_value" type="text" className="validate" onChange={this.handleValueChange} />
                                 <label htmlFor="account_value">Value of Account</label>
                             </div>
@@ -91,7 +107,7 @@ class AccountsForm extends Component {
                                 <label htmlFor="date">Date</label>
                             </div>
                         </div>
-                        <button className="waves-effect waves-light btn-large" type="submit" value="Submit" onClick={this.handleDateChange}>Save</button>
+                        <button className="waves-effect waves-light btn-large" type="submit" value="Submit">Save</button>
                     </form>
                 </div>
             </div>
@@ -99,4 +115,4 @@ class AccountsForm extends Component {
     }
 }
 
-export default AccountsForm;
+export default EditAccountForm;
