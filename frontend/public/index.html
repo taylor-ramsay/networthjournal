@@ -36,8 +36,27 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+    <script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
     <script src="./dropdown.js"></script>
     <script src="./datepicker.js"></script>
+<script>
+  $(document).ready(function(){
+    // Materialize.updateTextFields()
+    //$('select').material_select();
+    
+    $('.edit-link, .add-link').on('click', function() {
+      setTimeout(() => {
+        M.updateTextFields()
+        $('select').formSelect()
+        M.updateTextFields()
+        $('.datepicker').datepicker()
+      },0)
+    });
+  })
+    </script>
   </body>
 </html>

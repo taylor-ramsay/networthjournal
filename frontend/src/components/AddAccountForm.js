@@ -64,7 +64,7 @@ class AddAccountForm extends Component {
                             </div>
                         </div>
                 <div className="row">
-                    <form onSubmit={this.handleSubmit} className="col s12">
+                    <form onSubmit={this.props.handleSubmit} className="col s12">
                         <div className="row">
                             <div className="input-field col s12">
                                 <select value={this.state.type} onChange={this.handleTypeChange}>
