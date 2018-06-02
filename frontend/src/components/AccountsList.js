@@ -13,7 +13,7 @@ class AccountsList extends Component {
         return (
             <div>
                 <ul className="collection with-header">
-                    <li className="collection-header"><h4>Accounts</h4><a href="/add-account"><Link className="add-link" to="/add-account">add account</Link></a></li>
+                    <li className="collection-header"><h4>Accounts</h4><a href="/add-account" onClick={()=>{this.props.addButtonHandler()}}><Link className="add-link" to="/add-account">add account</Link></a></li>
                     {accountsJSX}
                 </ul>
             </div>

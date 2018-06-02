@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+    Schema = mongoose.Schema;
 const express = require('express'),
     bodyParser = require('body-parser')
     app = express()
@@ -29,7 +30,6 @@ const Valuation = require('./models/Valuation')
 
 //Create new account
 app.post('/add-account', (req,res)=>{
-    console.log("endpoint hit!")
     let newAccount = Account(req.body)
     console.log(newAccount)
     newAccount.save()
@@ -52,18 +52,20 @@ app.get('/get-accounts', (req,res)=>{
     })
 })
 
-//update account
+//Update account
 app.put('/edit-account/:accountId', (req, res)=>{
     console.log(req.body)
     __object = req.body
-    let accountToUpdate = {"_id":req.params.accountId}
+    let accountToUpdate = {"accountId": req.params.accountId}
+    console.log(accountToUpdate)
     let update = {
-        type: __object.type,
-        subType: __object.subtype,
+        balance: __object.balance,
         name: __object.name,
-        balance: __object.value,
+        type: __object.type,
+        subType: __object.subType,
         date: __object.date,
-        timeStamp: __object.date
+        timeStamp: __object.timeStamp,
+        accountId: __object.accountId
     }
     Account.findOneAndUpdate(accountToUpdate, update, { new:true, runValidators:true })
     .then(updatedAccount => {
@@ -74,6 +76,79 @@ app.put('/edit-account/:accountId', (req, res)=>{
         res.status(400).json({error})
     })
 })
+
+//create a valuation
+app.put('/add-valuation', (req,res)=>{
+    let newValuation = Valuation({
+        newBalance: req.body.newBalance,
+        newDate: req.body.newDate,
+        timeStamp: req.body.timeStamp,
+        valuationId: req.body.valuationId
+    })
+    newValuation.save(function(err,val) {
+
+
+
+    const mewtwoID = val.id;
+        // then we get the shelter we want using .find or .findOne
+    Account.findOne({accountId: req.body.accountId})
+        .then(sandbox => {
+            // once we have the shelter, we push the new kat id
+            //  into the kittens array
+            sandbox.valuations.push(mewtwoID);
+
+            // then we call save on the shelter we just edited
+            return sandbox.save()
+        })
+        .then(savedShelter => {
+            console.log(savedShelter);
+        })
+        .catch(error => {
+            console.log(error);
+        })
+
+        // console.log(val.id);
+
+        // let accountToUpdate = {"accountId": req.body.accountId}
+        // let update = Account({
+        //     valuations: ['5b11ecdc334d8159bb8a8ef9']
+        // })
+        // Account.findOneAndUpdate(accountToUpdate, update, { new:true, runValidators:true })
+        // .then(updatedAccount => {
+        //     res.json(updatedAccount)
+        // })
+        // .catch(error => {
+        //     console.log(error)
+        //     res.status(400).json({error})
+        // })
+     })
+})
+
+app.put('/add-val-to-account', (req, res)=>{
+    var user = db.accounts.findOne({accountId:"And"})
+    __object = req.body
+    let accountToUpdate = {"accountId": req.params.accountId}
+    console.log(accountToUpdate)
+    let update = {
+        balance: __object.balance,
+        name: __object.name,
+        type: __object.type,
+        subType: __object.subType,
+        date: __object.date,
+        timeStamp: __object.timeStamp,
+        accountId: __object.accountId
+    }
+    Account.findOneAndUpdate(accountToUpdate, update, { new:true, runValidators:true })
+    .then(updatedAccount => {
+        res.json(updatedAccount)
+    })
+    .catch(error => {
+        console.log(error)
+        res.status(400).json({error})
+    })
+})
+
+//add a valuation to an account
 
 //Port 8080
 app.listen(8080, ()=>{

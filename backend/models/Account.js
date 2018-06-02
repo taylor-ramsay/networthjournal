@@ -23,6 +23,14 @@ const accountSchema = new Schema({
         type: Date,
         required: true
     },
+    valuations: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Valuation'
+    }],
+    accountId: {
+        type: String,
+        required: true
+    },
     timeStamp: Date
 })
 

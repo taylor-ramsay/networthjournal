@@ -10,7 +10,11 @@ const monthlyJournalSchema = new Schema({
         type: Date,
         required: true
     },
-    timeStamp: Date
+    timeStamp: Date,
+    journalId: {
+        type: String,
+        required: true
+    }
 })
 
 const MonthlyJournalModel = mongoose.model('MonthlyJournal', monthlyJournalSchema)

@@ -1,22 +1,20 @@
 const mongoose = require('mongoose');
-        Schema = mongoose.Schema,
-        ObjectId = Schema.Types.ObjectId
+        Schema = mongoose.Schema
 
 const valuationSchema = new Schema({
-    account: {
-        type: ObjectId,
-        ref: 'Account',
-        required: true
-    },
-    balance: {
+    newBalance: {
         type: Number,
         required: true
     },
-    date: {
+    newDate: {
         type: Date,
         required: true
     },
-    timeStamp: Date
+    timeStamp: Date,
+    valuationId: {
+        type: String,
+        required: true
+    }
 })
 
 const ValuationModel = mongoose.model('Valuation', valuationSchema)
