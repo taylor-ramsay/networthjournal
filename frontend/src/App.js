@@ -5,6 +5,7 @@ import moment from 'moment'
 import AddAccountForm from './components/AddAccountForm'
 import AccountForm from './components/AccountForm'
 import AccountsList from './components/AccountsList'
+import AccountChart from './components/AccountChart'
 import axios from 'axios'
 import uniqid from 'uniqid'
 
@@ -21,8 +22,7 @@ class App extends Component {
         subType: "",
         date: moment().format("MMM DD, YYYY"),
         timeStamp: moment(),
-        accountId: uniqid(),
-        valuation: {}
+        accountId: uniqid()
       },
       accounts: [{
         _id: null,
@@ -31,8 +31,15 @@ class App extends Component {
         type: "",
         subType: "",
         date: moment().format("MMM DD, YYYY"),
+        valuations: [],
         timeStamp: moment(),
         accountId: uniqid(),
+      }],
+      valuations: [{
+        newBalance: 0,
+        newDate: "",
+        timeStamp: "",
+        valuationId: ""
       }],
       monthlyJournal: [{
         entry: "",
@@ -46,9 +53,16 @@ class App extends Component {
   componentDidMount() {
     axios.get('http://localhost:8080/get-accounts')
       .then(result => {
-        let accountsFromServer = result.data
         this.setState({
-          accounts: accountsFromServer
+          accounts: result.data
+        })
+      })
+      .then(result=>{
+        axios.get('http://localhost:8080/get-valuations')
+        .then(result => {
+          this.setState({
+            valuations: result.data
+          })
         })
       })
   }
@@ -163,6 +177,13 @@ class App extends Component {
       timeStamp: this.state.currentAccount.timeStamp,
       accountId: this.state.currentAccount.accountId
     }
+    let newValuation = {
+      accountId: this.state.currentAccount.accountId,
+      newBalance: this.state.currentAccount.balance,
+      newDate: this.state.currentAccount.date,
+      timeStamp: this.state.currentAccount.timeStamp,
+      valuationId: uniqid()
+    }
     if (urlLocation === "/add-account") {
       axios.post('http://localhost:8080/add-account', formSubmissionValues)
         .then(result => {
@@ -170,7 +191,8 @@ class App extends Component {
           .then(result => {
             let accountsFromServer = result.data
             this.setState({
-              accounts: accountsFromServer
+              accounts: accountsFromServer,
+              valuations: newValuation
             })
           })
         })
@@ -184,7 +206,22 @@ class App extends Component {
       })
       let currentAccountMonthYear = moment(this.state.currentAccount.date).format('MMM YYYY')
       let dbAccountMonthYear = moment(dbAccount.date).format('MMM YYYY')
-      if(currentAccountMonthYear === dbAccountMonthYear){
+      if(currentAccountMonthYear !== dbAccountMonthYear){
+        console.log("else")
+        axios.put('http://localhost:8080/add-valuation', newValuation)
+        .then(result=>{
+          axios.get('http://localhost:8080/get-accounts')
+          .then(result => {
+            this.setState({
+              accounts: result.data
+            })
+          })
+        })
+        .catch(error=>{
+          console.log(error)
+        })    
+      }
+      else {
         axios.put('http://localhost:8080/edit-account/'+this.state.currentAccount.accountId, formSubmissionValues)
         .then(result=>{
           axios.get('http://localhost:8080/get-accounts')
@@ -194,45 +231,31 @@ class App extends Component {
               accounts: accountsFromServer
             })
           })
-        })
-        .catch(error=>{
-          console.log(error)
-        })    
-      }
-      else{
-        console.log("else")
-        let newValuation = {
-          accountId: this.state.currentAccount.accountId,
-          newBalance: this.state.currentAccount.balance,
-          newDate: this.state.currentAccount.date,
-          timeStamp: this.state.currentAccount.timeStamp,
-          valuationId: uniqid()
-        }
-        axios.put('http://localhost:8080/add-valuation', newValuation)
-        .then(result=>{
-          axios.get('http://localhost:8080/get-accounts')
-          .then(result => {
-            let accountsFromServer = result.data
-            this.setState({
-              accounts: accountsFromServer
+          .then(result=>{
+            axios.get('http://localhost:8080/get-valuations')
+            .then(result => {
+              this.setState({
+                valuations: result.data
+              })
             })
           })
         })
         .catch(error=>{
           console.log(error)
-        })   
+        })  
       }
     }  
   }
 
   render() {
-    // console.log(({ location }) => (this.props.location))
+    console.log(this.state.valuations)
     return (
       <div className="container">
         <Switch>
           <div className="row">
             <div className="col s8">
               <Route path="/" render={(props) => { return <AccountsList accounts={this.state.accounts} editButtonHandler={this.editButtonHandler} addButtonHandler={this.addButtonHandler} /> }} />
+              <Route path="/" render={(props) => { return <AccountChart accounts={this.state.accounts} valuations={this.state.valuations} /> }} />
             </div>
             <div className="col s4">
               <Route path="/add-account" render={(props) => { return <AccountForm propsFromParent={props} handleSubmit={this.handleSubmit} currentAccount={this.state.currentAccount} getCurrentAccount={this.getCurrentAccount} _id={this.state.currentAccount._id} balance={this.state.currentAccount.balance} name={this.state.currentAccount.name} type={this.state.currentAccount.type} subType={this.state.currentAccount.subType} date={this.state.currentAccount.date} timeStamp={this.state.currentAccount.timeStamp} handleNameChange={this.handleNameChange} handleBalanceChange={this.handleBalanceChange} handleTypeChange={this.handleTypeChange} handleSubtypeChange={this.handleSubtypeChange} handleDateChange={this.handleDateChange} /> }} />
