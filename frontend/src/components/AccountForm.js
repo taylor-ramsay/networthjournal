@@ -48,7 +48,7 @@ class AccountForm extends Component {
                         </div>
                         <div className="row">
                             <div className="input-field col s12">
-                                <input value={moment(this.props.date).format("MMM DD, YYYY")} type="text" id="date" className="datepicker" />
+                                <input value={moment(this.props.date).format("MMM YYYY")} type="text" id="date" className="datepicker" />
                                 <label htmlFor="date" className="active">Date</label>
                             </div>
                         </div>

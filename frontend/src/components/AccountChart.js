@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
 import { Line } from 'react-chartjs-2';
+import moment from 'moment'
+import lodash from 'lodash'
 
 class AccountChart extends Component {
 
-
-    //?? WTF, COMPONENT IS LOADING TWICE!! CAUSED BY COMPONENT DID MOUNT IN APP
-
     render() {
-        //console.log("test")
         let accounts = this.props.accounts
         let valuations = this.props.valuations
         //Push valuations arrays into accounts objects as valuationAmounts
@@ -25,10 +23,13 @@ class AccountChart extends Component {
         let labelArr = []
         let datasetArr = []
         let dataArr = []
-        let dataArr0 = []
+        let dateArr = []
+        let dateArrPlot = []
+        let xyDataArray = []
 
         for (let i = 0; i < accounts.length; i++) {
             dataArr[i] = []
+            xyDataArray[i] = []
             let datasetObj = {
                 label: accounts[i].name,
                 fill: false,
@@ -48,42 +49,63 @@ class AccountChart extends Component {
                 pointHoverBorderWidth: 2,
                 pointRadius: 1,
                 pointHitRadius: 10,
-                data: dataArr[i],
+                data: xyDataArray[i]
             }
             for (let j = 0; j < accounts[i].valuationAmounts.length; j++) {
-                labelArr.push(accounts[i].valuationAmounts[j].newDate)
-                dataArr[i].push(accounts[i].valuationAmounts[j].newBalance)
+                var dates = accounts[i].valuationAmounts[j].newDate
+                dateArr.push(dates)
+                let xyData = {
+                    x: moment(accounts[i].valuationAmounts[j].newDate).format("MM/YYYY"),
+                    y: accounts[i].valuationAmounts[j].newBalance
+                }
+                xyDataArray[i].push(xyData)
             }
             datasetArr.push(datasetObj)
         }
 
-        console.log(labelArr)
-        
+        //Find the earliest date and the last date and create an array of months within that range
+        if (dateArr.length) {
+            let sortedDates = dateArr.sort()
+            let earliestDate = sortedDates[0]
+            let latestDate = sortedDates[sortedDates.length - 1]
+            console.log(sortedDates)
 
+            let ld = moment(latestDate)
+            let ed = moment(earliestDate)
+            let diffInMonths = ld.diff(ed, 'months');
+            console.log(ed)
+            console.log(ld)
 
-
+            console.log(diffInMonths + "DIFF")
+            for (let i = 0; i < diffInMonths+1; i++) {
+                labelArr.push(moment(earliestDate).add(i, 'months').format("MM/YYYY"))
+            }
+        }
 
         const data = {
             labels: labelArr,
             datasets: datasetArr
         };
 
-     
-            const options = {
-                scales: {
-                    xAxes: [{
-                        time: {
-                            unit: 'month'
-                        }
-                    }]
-                }
-            
+        const options = {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }],
+                xAxes: [{
+                    distribution: 'series',
+                    time: {
+                        unit: 'month'
+                    }
+                }]
+            }
         }
-
 
         return (
             <div>
-                 <Line data={data} width={1000} height={500} options={options} />
+                <Line data={data} width={1000} height={800} options={options} />
             </div>
         );
     }

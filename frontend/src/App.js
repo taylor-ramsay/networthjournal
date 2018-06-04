@@ -20,7 +20,7 @@ class App extends Component {
         name: "",
         type: "",
         subType: "",
-        date: moment().format("MMM DD, YYYY"),
+        date: moment().format("MMM YYYY"),
         timeStamp: moment(),
         accountId: uniqid()
       },
@@ -30,7 +30,7 @@ class App extends Component {
         name: "",
         type: "",
         subType: "",
-        date: moment().format("MMM DD, YYYY"),
+        date: moment().format("MMM YYYY"),
         valuations: [],
         timeStamp: moment(),
         accountId: uniqid(),
@@ -57,13 +57,13 @@ class App extends Component {
           accounts: result.data
         })
       })
-      .then(result=>{
+      .then(result => {
         axios.get('http://localhost:8080/get-valuations')
-        .then(result => {
-          this.setState({
-            valuations: result.data
+          .then(result => {
+            this.setState({
+              valuations: result.data
+            })
           })
-        })
       })
   }
 
@@ -84,8 +84,8 @@ class App extends Component {
         name: "",
         type: "",
         subType: "",
-        date: moment().format("MMM DD, YYYY"),
-        timeStamp: moment().format("MMM DD, YYYY"),
+        date: moment().format("MMM YYYY"),
+        timeStamp: moment().format("MMM YYYY"),
         accountId: uniqid()
       }
     })
@@ -105,7 +105,7 @@ class App extends Component {
       }
     })
   }
-  
+
   handleBalanceChange = (e) => {
     this.setState({
       currentAccount: {
@@ -159,7 +159,7 @@ class App extends Component {
         name: this.state.currentAccount.name,
         type: this.state.currentAccount.type,
         subType: this.state.currentAccount.subType,
-        date: moment(document.getElementById('date').value).format("MMM DD, YYYY"),
+        date: moment(document.getElementById('date').value).format("MMM YYYY"),
         timeStamp: this.state.currentAccount.timeStamp,
         accountId: this.state.currentAccount.accountId
       }
@@ -187,6 +187,9 @@ class App extends Component {
     if (urlLocation === "/add-account") {
       axios.post('http://localhost:8080/add-account', formSubmissionValues)
         .then(result => {
+          axios.put('http://localhost:8080/add-valuation', newValuation)
+        })
+        .then(result => {
           axios.get('http://localhost:8080/get-accounts')
           .then(result => {
             let accountsFromServer = result.data
@@ -200,51 +203,51 @@ class App extends Component {
           console.log(error)
         })
     }
-    else if(urlLocation === "/edit-account") {
-      let dbAccount = this.state.accounts.find((el)=>{
+    else if (urlLocation === "/edit-account") {
+      let dbAccount = this.state.accounts.find((el) => {
         return el.accountId === this.state.currentAccount.accountId
       })
       let currentAccountMonthYear = moment(this.state.currentAccount.date).format('MMM YYYY')
       let dbAccountMonthYear = moment(dbAccount.date).format('MMM YYYY')
-      if(currentAccountMonthYear !== dbAccountMonthYear){
+      if (currentAccountMonthYear !== dbAccountMonthYear) {
         console.log("else")
         axios.put('http://localhost:8080/add-valuation', newValuation)
-        .then(result=>{
-          axios.get('http://localhost:8080/get-accounts')
           .then(result => {
-            this.setState({
-              accounts: result.data
-            })
+            axios.get('http://localhost:8080/get-accounts')
+              .then(result => {
+                this.setState({
+                  accounts: result.data
+                })
+              })
           })
-        })
-        .catch(error=>{
-          console.log(error)
-        })    
+          .catch(error => {
+            console.log(error)
+          })
       }
       else {
-        axios.put('http://localhost:8080/edit-account/'+this.state.currentAccount.accountId, formSubmissionValues)
-        .then(result=>{
-          axios.get('http://localhost:8080/get-accounts')
+        axios.put('http://localhost:8080/edit-account/' + this.state.currentAccount.accountId, formSubmissionValues)
           .then(result => {
-            let accountsFromServer = result.data
-            this.setState({
-              accounts: accountsFromServer
-            })
-          })
-          .then(result=>{
-            axios.get('http://localhost:8080/get-valuations')
-            .then(result => {
-              this.setState({
-                valuations: result.data
+            axios.get('http://localhost:8080/get-accounts')
+              .then(result => {
+                let accountsFromServer = result.data
+                this.setState({
+                  accounts: accountsFromServer
+                })
               })
-            })
+              .then(result => {
+                axios.get('http://localhost:8080/get-valuations')
+                  .then(result => {
+                    this.setState({
+                      valuations: result.data
+                    })
+                  })
+              })
           })
-        })
-        .catch(error=>{
-          console.log(error)
-        })  
+          .catch(error => {
+            console.log(error)
+          })
       }
-    }  
+    }
   }
 
   render() {
