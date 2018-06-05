@@ -9,6 +9,7 @@ import AccountChart from './components/AccountChart'
 import NetWorthChart from './components/NetWorthChart'
 import axios from 'axios'
 import uniqid from 'uniqid'
+import _ from 'lodash'
 
 class App extends Component {
 
@@ -57,6 +58,7 @@ class App extends Component {
         this.setState({
           accounts: result.data
         })
+        console.log(result.data)
       })
       .then(result => {
         axios.get('http://localhost:8080/get-valuations')
@@ -219,45 +221,6 @@ class App extends Component {
         }
       }
 
-      ///DELETE BELOW ONCE NETWORTH CHART IS COMPLETED
-      //Check to see when the last valuation was and if the valuation 1 month away or more add a valuation for the gap month(s)
-      let thisValuation = this.state.currentAccount.date
-      let allValuationDates = []
-      for (let i = 0; i < accounts.length; i++) {
-        console.log(accounts[i].accountId)
-        console.log(this.state.currentAccount.accountId)
-        if(accounts[i].accountId === this.state.currentAccount.accountId)
-        for(let j=0; j<accounts[i].valuationAmounts.length; j++){
-          console.log(accounts[i])
-          allValuationDates.push(accounts[i].valuationAmounts[j])
-        }
-      }
-      let sortedValuationDates = allValuationDates.sort()
-      let lastValuationDate = sortedValuationDates[sortedValuationDates.length-1]
-      let ld = moment(lastValuationDate)
-      let td = moment(thisValuation)
-      let diff = td.diff(ld, 'months')
-      console.log(allValuationDates)
-      console.log(ld)
-      console.log(td)
-      console.log(diff)
-
-      let updatePastValuations = []
-      if (diff > 0) {
-        for (let i = 1; i < diff; i++) {
-          var PastValuationsObj = {
-            accountId: this.state.currentAccount.accountId,
-            newBalance: this.state.currentAccount.balance,
-            newDate: moment(this.state.currentAccount.date).subtract(i, 'months').format('MM/YYYY'),
-            timeStamp: this.state.currentAccount.timeStamp,
-            valuationId: uniqid()
-          }
-          updatePastValuations.push(PastValuationsObj)
-          console.log(updatePastValuations)
-        }
-      }
-   ///////////////////////////////////
-
       let dbAccount = this.state.accounts.find((el) => {
         return el.accountId === this.state.currentAccount.accountId
       })
@@ -265,14 +228,16 @@ class App extends Component {
       let dbAccountMonthYear = moment(dbAccount.date).format('MMM YYYY')
       if (currentAccountMonthYear !== dbAccountMonthYear) {
         console.log("else")
-        console.log(updatePastValuations)
         axios.put('http://localhost:8080/add-valuation', newValuation)
           .then(result => {
-            axios.get('http://localhost:8080/get-accounts')
+            axios.put('http://localhost:8080/edit-account/' + this.state.currentAccount.accountId, formSubmissionValues)
               .then(result => {
-                this.setState({
-                  accounts: result.data
-                })
+                axios.get('http://localhost:8080/get-accounts')
+                  .then(result => {
+                    this.setState({
+                      accounts: result.data
+                    })
+                  })
               })
           })
           .catch(error => {
@@ -305,7 +270,31 @@ class App extends Component {
     }
   }
 
+  getCurrentNetWorth() {
+    //Push valuations arrays into accounts objects as valuationAmounts
+    let accounts = this.state.accounts
+    let valuations = this.state.valuations
+
+    for (let i = 0; i < accounts.length; i++) {
+      let newVal = accounts[i].valuationAmounts = []
+      for (let j = 0; j < accounts[i].valuations.length; j++) {
+        for (let k = 0; k < valuations.length; k++) {
+          if (accounts[i].valuations[j] === valuations[k]._id) {
+            accounts[i].valuationAmounts.push(valuations[k])
+          }
+        }
+      }
+    }
+
+    //Get latest valuation for each account each month
+     for (let i = 0; i < accounts.length; i++) {
+      var valuationsSortedByDate = _.sortBy(accounts[i].valuationAmounts, ['_id', 'newDate'])
+      console.log(valuationsSortedByDate[0])
+    }
+  }
+
   render() {
+    this.getCurrentNetWorth()
     return (
       <div className="container">
         <Switch>

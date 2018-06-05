@@ -63,7 +63,7 @@ class AccountChart extends Component {
                 var dates = accounts[i].valuationAmounts[j].newDate
                 dateArr.push(dates)
             }
-            
+
         }
 
         //Find the earliest date and the last date and create an array of months within that range for x-axis
@@ -79,20 +79,19 @@ class AccountChart extends Component {
             }
         }
 
-        //Get latest valuation for each account each month
         let assetsArr = []
         let assetsTotal = []
         let liabilitiesArr = []
         let liabilitiesTotal = []
 
-
+        //Get latest valuation for each account each month
         for (let i = 0; i < accounts.length; i++) {
             assetsArr[i] = []
             liabilitiesArr[i] = []
             var valuationsSortedByDate = _.sortBy(accounts[i].valuationAmounts, ['_id', 'newDate'])
 
             let currentVal = 0
-
+            //Push account value by month into their respective arrays
             for (let j = 0; j < labelArr.length; j++) {
                 if (valuationsSortedByDate[currentVal]) {
                     if (labelArr[j] == moment(valuationsSortedByDate[currentVal].newDate).format('MM/YYYY') && accounts[i].type === "Asset") {
@@ -135,8 +134,18 @@ class AccountChart extends Component {
             return r;
         }, []);
 
+        //Calculate networth for eachmonth
         for (var i = 0; i < assetsByMonth.length; i++) {
-            netWorthByMonth.push(assetsByMonth[i] - liabilitiesByMonth[i]);
+            if (assetsByMonth.length > 0 && liabilitiesByMonth.length > 0) {
+                netWorthByMonth.push(assetsByMonth[i] - liabilitiesByMonth[i]);
+            }
+            else if (assetsByMonth.length > 0) {
+                
+                netWorthByMonth.push(assetsByMonth[i])
+            }
+            else if (liabilitiesByMonth.length > 0) {
+                netWorthByMonth.push(-liabilitiesByMonth[i])
+            }
         }
 
         console.log(assetsByMonth)
@@ -172,7 +181,7 @@ class AccountChart extends Component {
             <div>
                 <Line data={data} width={1000} height={800} options={options} />
             </div>
-        );
+        )
     }
 }
 
