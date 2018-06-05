@@ -8,12 +8,13 @@ const valuationSchema = new Schema({
     },
     newDate: {
         type: Date,
-        required: true
+        required: true,
+        unique: true
     },
     timeStamp: Date,
     valuationId: {
         type: String,
-        required: true
+        required: true,
     }
 })
 
