@@ -58,21 +58,47 @@ class JournalEntryList extends Component {
                         currentVal = currentVal + 1
                     }
                     else if (labelArr[j] != moment(valuationsSortedByDate[currentVal].newDate).format('MM/YYYY') && accounts[i].type === "Asset") {
-                        assetsArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
+                        console.log(currentVal)
+                        //console.log(valuationsSortedByDate[currentVal-1].newBalance)
+                        if (currentVal > 0) {
+                            assetsArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
+                        }
+                        else {
+                            assetsArr[i].push(valuationsSortedByDate[currentVal].newBalance)
+                        }
                     }
                     else if (labelArr[j] == moment(valuationsSortedByDate[currentVal].newDate).format('MM/YYYY') && accounts[i].type === "Liability") {
                         liabilitiesArr[i].push(valuationsSortedByDate[currentVal].newBalance)
                         currentVal = currentVal + 1
                     }
                     else if (labelArr[j] != moment(valuationsSortedByDate[currentVal].newDate).format('MM/YYYY') && accounts[i].type === "Liability") {
-                        liabilitiesArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
+                        if (valuationsSortedByDate.length >= 1) {
+                            if (currentVal > 0) {
+                                liabilitiesArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
+                            }
+                            else {
+                                liabilitiesArr[i].push(valuationsSortedByDate[currentVal].newBalance)
+                            }
+                        }
                     }
                 }
                 else if (accounts[i].type === "Asset") {
-                    assetsArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
+                    if (currentVal > 0) {
+                        assetsArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
+                    }
+                    else {
+                        assetsArr[i].push(valuationsSortedByDate[currentVal].newBalance)
+                    }
                 }
                 else if (accounts[i].type === "Liability") {
-                    liabilitiesArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
+                    if (currentVal > 0) {
+                        if (currentVal > 0) {
+                            liabilitiesArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
+                        }
+                        else {
+                            liabilitiesArr[i].push(valuationsSortedByDate[currentVal].newBalance)
+                        }
+                    }
                 }
             }
         }
@@ -117,8 +143,6 @@ class JournalEntryList extends Component {
         let journalsJSX = labelArr.map((label, i) => {
 
             for(let j = 0; j<monthlyJournal.length; j++){
-                console.log(monthlyJournal[j].date)
-                console.log(labelArr[i])
                 if(moment(monthlyJournal[j].date).format("MM/YYYY") == labelArr[i]){
                     var journalEntry = monthlyJournal[j].entry 
                 } 

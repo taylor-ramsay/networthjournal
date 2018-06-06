@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
 import { Line } from 'react-chartjs-2';
 import moment from 'moment'
+import _ from 'lodash'
 
 class AccountChart extends Component {
 
-    constructor(){
+    constructor() {
         super()
         this.state = {
-            currentChart: "allAccountsChart" 
+            currentChart: "allAccountsChart"
         }
     }
 
     render() {
+        
         //Defining props
         let accounts = this.props.accounts
         let valuations = this.props.valuations
@@ -27,7 +29,6 @@ class AccountChart extends Component {
                 }
             }
         }
-
         //Creating chart data for all accounts
         let labelArr = []
         let datasetArr = []
@@ -35,10 +36,32 @@ class AccountChart extends Component {
         let dateArr = []
         let dateArrPlot = []
         let xyDataArray = []
+        //Get dates for all valuations and push into array
+        for (let i = 0; i < accounts.length; i++) {
+            for (let j = 0; j < accounts[i].valuationAmounts.length; j++) {
+                var dates = accounts[i].valuationAmounts[j].newDate
+                dateArr.push(dates)
+            }
+        }
+        //Find the earliest date and the last date and create an array of months within that range for x-axis
+        if (dateArr.length) {
+            let sortedDates = dateArr.sort()
+            let earliestDate = sortedDates[0]
+            let latestDate = sortedDates[sortedDates.length - 1]
+            let ld = moment(latestDate)
+            let ed = moment(earliestDate)
+            let diffInMonths = ld.diff(ed, 'months');
+            for (let i = 0; i < diffInMonths + 1; i++) {
+                labelArr.push(moment(earliestDate).add(i, 'months').format("MM/YYYY"))
+            }
+        }
+        //Create data objects for charts
         for (let i = 0; i < accounts.length; i++) {
             dataArr[i] = []
             xyDataArray[i] = []
-            let datasetObj = {
+            let sortedXyDataArray = []
+            
+            let datasetObj = {   
                 label: accounts[i].name,
                 fill: false,
                 lineTension: 0.1,
@@ -59,29 +82,25 @@ class AccountChart extends Component {
                 pointHitRadius: 10,
                 data: xyDataArray[i]
             }
-            for (let j = 0; j < accounts[i].valuationAmounts.length; j++) {
-                var dates = accounts[i].valuationAmounts[j].newDate
-                dateArr.push(dates)
-                let xyData = {
-                    x: moment(accounts[i].valuationAmounts[j].newDate).format("MM/YYYY"),
-                    y: accounts[i].valuationAmounts[j].newBalance
+            let valuationsSortedByDate = _.sortBy(accounts[i].valuationAmounts, ['_id', 'newDate'])
+            for (let j = 0; j < valuationsSortedByDate.length; j++) {
+                if (valuationsSortedByDate[j] === valuationsSortedByDate[valuationsSortedByDate.length-1]) {
+                    var xyData = {
+                        x: labelArr[labelArr.length-1],
+                        y: valuationsSortedByDate[valuationsSortedByDate.length-1].newBalance
+                    }
+                    xyDataArray[i].push(xyData)
                 }
-                xyDataArray[i].push(xyData)
+                    var xyData = {
+                        x: moment(valuationsSortedByDate[j].newDate).format("MM/YYYY"),
+                        y: accounts[i].valuationAmounts[j].newBalance
+                    }
+                    xyDataArray[i].push(xyData)
             }
             datasetArr.push(datasetObj)
-        }
-
-        //Find the earliest date and the last date and create an array of months within that range for x-axis
-        if (dateArr.length) {
-            let sortedDates = dateArr.sort()
-            let earliestDate = sortedDates[0]
-            let latestDate = sortedDates[sortedDates.length - 1]
-            let ld = moment(latestDate)
-            let ed = moment(earliestDate)
-            let diffInMonths = ld.diff(ed, 'months');
-            for (let i = 0; i < diffInMonths + 1; i++) {
-                labelArr.push(moment(earliestDate).add(i, 'months').format("MM/YYYY"))
-            }
+            sortedXyDataArray = xyDataArray[i].sort((a,b) => {
+                return Number(a['x'].split('/').join('')) - Number(b['x'].split('/').join(''));
+            })
         }
         
         //Assign computed data to chart data
@@ -89,7 +108,7 @@ class AccountChart extends Component {
             labels: labelArr,
             datasets: datasetArr
         };
-        
+
         //Chart options
         const options = {
             scales: {
@@ -107,12 +126,14 @@ class AccountChart extends Component {
             }
         }
 
+    
+
         return (
             <div>
                 <Line data={data} width={1000} height={800} options={options} />
             </div>
         );
-    }
+}
 }
 
 export default AccountChart;

@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
 import moment from 'moment'
+import $ from "jquery"
 
 class AccountForm extends Component {
+
+    componentDidMount(){
+        window.test()
+    }
 
     render() {
         let urlPath = this.props.propsFromParent.location.pathname

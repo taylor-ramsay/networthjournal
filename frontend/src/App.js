@@ -61,28 +61,43 @@ class App extends Component {
   }
 
   componentDidMount() {
-    axios.get('http://localhost:8080/get-accounts')
-      .then(result => {
-        this.setState({
-          accounts: result.data
-        })
+
+    axios.all([this.getAccounts(), this.getValuations(), this.getJournals()])
+    .then(axios.spread((getAcc, getVal, getJour)=> {
+      console.log(getAcc.data)
+      console.log(getVal.data)
+      this.setState({
+        accounts: getAcc.data,
+        valuations: getVal.data,
+        monthlyJournal: getJour
       })
-      .then(result => {
-        axios.get('http://localhost:8080/get-valuations')
-          .then(result => {
-            this.setState({
-              valuations: result.data
-            })
-          })
-      })
-      .then(result => {
-        axios.get('http://localhost:8080/get-journals')
-          .then(result => {
-            this.setState({
-              monthlyJournal: result.data
-            })
-          })
-      })
+    }))
+    .catch(error => {
+      console.log(error)
+    })
+    
+    // axios.get('http://localhost:8080/get-accounts')
+    //   .then(result => {
+    //     this.setState({
+    //       accounts: result.data
+    //     })
+    //   })
+    //   .then(result => {
+    //     axios.get('http://localhost:8080/get-valuations')
+    //       .then(result => {
+    //         this.setState({
+    //           valuations: result.data
+    //         })
+    //       })
+    //   })
+    //   .then(result => {
+    //     axios.get('http://localhost:8080/get-journals')
+    //       .then(result => {
+    //         this.setState({
+    //           monthlyJournal: result.data
+    //         })
+    //       })
+    //   })
   }
 
   editButtonHandler = (id) => {
@@ -90,7 +105,9 @@ class App extends Component {
       return el._id === id
     })
     this.setState({
-      currentAccount: accountFound
+      currentAccount: accountFound,
+      monthlyJournal: this.state.monthlyJournal,
+      accounts: this.state.accounts
     })
   }
 
@@ -183,6 +200,29 @@ class App extends Component {
       }
     })
   }
+
+  addAccount = (formSubmissionValues) => {
+    return axios.post('http://localhost:8080/add-account', formSubmissionValues);
+  }
+  getAccounts = () => {
+    return axios.get('http://localhost:8080/get-accounts');
+  }
+  getValuations = () => {
+    return axios.get('http://localhost:8080/get-valuations');
+  }
+  getJournals = () => {
+    return axios.get('http://localhost:8080/get-journals');
+  }
+  addAccount = (formSubmissionValues) => {
+    return axios.post('http://localhost:8080/add-account', formSubmissionValues);
+  }
+  addValuation = (newValuation) => {
+    return axios.put('http://localhost:8080/add-valuation', newValuation);
+  }
+  editAccount = (currentAccountId, formSubmissionValues) => {
+    return axios.put('http://localhost:8080/edit-account/' + this.state.currentAccount.accountId, formSubmissionValues);
+  }
+
   handleSubmit = (e, urlLocation) => {
     e.preventDefault()
     let formSubmissionValues = {
@@ -201,29 +241,35 @@ class App extends Component {
       timeStamp: this.state.currentAccount.timeStamp,
       valuationId: uniqid()
     }
+    // let getAccounts = () => {
+    //   return axios.get('http://localhost:8080/get-accounts');
+    // }
+    // let getValuations = () => {
+    //   return axios.get('http://localhost:8080/get-valuations');
+    // }
+    // let addAccount = (formSubmissionValues) => {
+    //   return axios.post('http://localhost:8080/add-account', formSubmissionValues);
+    // }
+    // let addValuation = () => {
+    //   return axios.put('http://localhost:8080/add-valuation', newValuation);
+    // }
+    // let editAccount = () => {
+    //   return axios.put('http://localhost:8080/edit-account/' + this.state.currentAccount.accountId, formSubmissionValues);
+    // }
     if (urlLocation === "/add-account") {
-      axios.post('http://localhost:8080/add-account', formSubmissionValues)
-        .then(result => {
-          axios.put('http://localhost:8080/add-valuation', newValuation)
-        })
-        .then(result => {
-          axios.get('http://localhost:8080/get-accounts')
-            .then(result => {
-              let accountsFromServer = result.data
-              this.setState({
-                accounts: accountsFromServer,
-              })
+        axios.all([this.addAccount(formSubmissionValues), this.addValuation(newValuation)])
+        .then(axios.spread((addAcc, addVal)=> {
+          axios.all([this.getAccounts(), this.getValuations(), this.getJournals()])
+          .then(axios.spread((getAcc, getVal, getJour)=> {
+            console.log(getAcc.data)
+            console.log(getVal.data)
+            this.setState({
+              accounts: getAcc.data,
+              valuations: getVal.data,
+              monthlyJournal: getJour.data
             })
-        })
-        .then(result => {
-          axios.get('http://localhost:8080/get-valuations')
-            .then(result => {
-              let valuationsFromServer = result.data
-              this.setState({
-                valuations: valuationsFromServer,
-              })
-            })
-        })
+          }))
+        }))
         .catch(error => {
           console.log(error)
         })
@@ -251,60 +297,92 @@ class App extends Component {
       let dbAccountMonthYear = moment(dbAccount.date).format('MMM YYYY')
       if (currentAccountMonthYear !== dbAccountMonthYear) {
         console.log("else")
-        axios.put('http://localhost:8080/add-valuation', newValuation)
-          .then(result => {
-            axios.put('http://localhost:8080/edit-account/' + this.state.currentAccount.accountId, formSubmissionValues)
-              .then(result => {
-                axios.get('http://localhost:8080/get-accounts')
-                  .then(result => {
-                    this.setState({
-                      accounts: result.data
-                    })
-                  })
-              })
-          })
-          .then(result => {
-            axios.get('http://localhost:8080/get-valuations')
-              .then(result => {
-                let valuationsFromServer = result.data
-                this.setState({
-                  valuations: valuationsFromServer,
-                })
-              })
-          })
-          .catch(error => {
-            console.log(error)
-          })
+
+        axios.all([this.editAccount(this.state.currentAccount.accountId, formSubmissionValues), this.addValuation(newValuation)])
+        .then(axios.spread((addAcc, addVal)=> {
+          axios.all([this.getAccounts(), this.getValuations(), this.getJournals()])
+          .then(axios.spread((getAcc, getVal, getJour)=> {
+            this.setState({
+              accounts: getAcc.data,
+              valuations: getVal.data,
+              monthlyJournal: getJour.data
+            })
+          }))
+        }))
+        .catch(error => {
+          console.log(error)
+        })
+
+      //   axios.put('http://localhost:8080/add-valuation', newValuation)
+      //     .then(result => {
+      //       axios.put('http://localhost:8080/edit-account/' + this.state.currentAccount.accountId, formSubmissionValues)
+      //         .then(result => {
+      //           axios.get('http://localhost:8080/get-accounts')
+      //             .then(result => {
+      //               this.setState({
+      //                 accounts: result.data
+      //               })
+      //             })
+      //         })
+      //     })
+      //     .then(result => {
+      //       axios.get('http://localhost:8080/get-valuations')
+      //         .then(result => {
+      //           let valuationsFromServer = result.data
+      //           this.setState({
+      //             valuations: valuationsFromServer,
+      //           })
+      //         })
+      //     })
+      //     .catch(error => {
+      //       console.log(error)
+      //     })
       }
       else {
-        axios.put('http://localhost:8080/edit-account/' + this.state.currentAccount.accountId, formSubmissionValues)
-          .then(result => {
-            axios.get('http://localhost:8080/get-accounts')
-              .then(result => {
-                let accountsFromServer = result.data
-                this.setState({
-                  accounts: accountsFromServer
-                })
-              })
-              .then(result => {
-                axios.get('http://localhost:8080/get-valuations')
-                  .then(result => {
-                    this.setState({
-                      valuations: result.data
-                    })
-                  })
-              })
-          })
-          .catch(error => {
-            console.log(error)
-          })
+
+        axios.all([this.editAccount(this.state.currentAccount.accountId, formSubmissionValues, this.addValuation(newValuation))])
+        .then(axios.spread((editAcc, addVal)=> {
+          axios.all([this.getAccounts(), this.getValuations(), this.getJournals()])
+          .then(axios.spread((getAcc, getVal, getJour)=> {
+            this.setState({
+              accounts: getAcc.data,
+              valuations: getVal.data,
+              monthlyJournal: getJour.data
+            })
+          }))
+        }))
+        .catch(error => {
+          console.log(error)
+        })
+
+        // axios.put('http://localhost:8080/edit-account/' + this.state.currentAccount.accountId, formSubmissionValues)
+        //   .then(result => {
+        //     axios.get('http://localhost:8080/get-accounts')
+        //       .then(result => {
+        //         let accountsFromServer = result.data
+        //         this.setState({
+        //           accounts: accountsFromServer
+        //         })
+        //       })
+        //       .then(result => {
+        //         axios.get('http://localhost:8080/get-valuations')
+        //           .then(result => {
+        //             this.setState({
+        //               valuations: result.data
+        //             })
+        //           })
+        //       })
+        //   })
+        //   .catch(error => {
+        //     console.log(error)
+        //   })
       }
     }
   }
 
   handleJournalEntryChange = (e) => {
     this.setState({
-      currentMonthlyJournal:{
+      currentMonthlyJournal: {
         entry: e.target.value,
         date: this.state.currentMonthlyJournal.date,
         timeStamp: this.state.currentMonthlyJournal.timeStamp,
@@ -315,7 +393,7 @@ class App extends Component {
 
   handleJournalEntryDateChange = (e) => {
     this.setState({
-      currentMonthlyJournal:{
+      currentMonthlyJournal: {
         entry: this.state.currentMonthlyJournal.entry,
         date: moment(document.getElementById('date').value).format("MMM YYYY"),
         timeStamp: this.state.currentMonthlyJournal.timeStamp,
@@ -334,15 +412,15 @@ class App extends Component {
     }
     console.log(formSubmissionValues)
     axios.post('http://localhost:8080/add-journal-entry', formSubmissionValues)
-    .then(result => {
-      axios.get('http://localhost:8080/get-journals')
-        .then(result => {
-          let journalsFromServer = result.data
-          this.setState({
-            monthlyJournal: journalsFromServer,
+      .then(result => {
+        axios.get('http://localhost:8080/get-journals')
+          .then(result => {
+            let journalsFromServer = result.data
+            this.setState({
+              monthlyJournal: journalsFromServer,
+            })
           })
-        })
-    })
+      })
   }
 
   render() {

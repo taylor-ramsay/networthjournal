@@ -3,7 +3,7 @@ import { Line } from 'react-chartjs-2';
 import moment from 'moment'
 import _ from 'lodash'
 
-class AccountChart extends Component {
+class NetWorthChart extends Component {
 
     render() {
 
@@ -53,7 +53,7 @@ class AccountChart extends Component {
             data: netWorthByMonth
         }
         datasetArr.push(datasetObj)
-        
+
         //Push ALL valuation dates into an array
         for (let i = 0; i < accounts.length; i++) {
             for (let j = 0; j < accounts[i].valuationAmounts.length; j++) {
@@ -96,21 +96,47 @@ class AccountChart extends Component {
                         currentVal = currentVal + 1
                     }
                     else if (labelArr[j] != moment(valuationsSortedByDate[currentVal].newDate).format('MM/YYYY') && accounts[i].type === "Asset") {
-                        assetsArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
+                        console.log(currentVal)
+                        //console.log(valuationsSortedByDate[currentVal-1].newBalance)
+                        if (currentVal > 0) {
+                            assetsArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
+                        }
+                        else {
+                            assetsArr[i].push(valuationsSortedByDate[currentVal].newBalance)
+                        }
                     }
                     else if (labelArr[j] == moment(valuationsSortedByDate[currentVal].newDate).format('MM/YYYY') && accounts[i].type === "Liability") {
                         liabilitiesArr[i].push(valuationsSortedByDate[currentVal].newBalance)
                         currentVal = currentVal + 1
                     }
                     else if (labelArr[j] != moment(valuationsSortedByDate[currentVal].newDate).format('MM/YYYY') && accounts[i].type === "Liability") {
-                        liabilitiesArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
+                        if (valuationsSortedByDate.length >= 1) {
+                            if (currentVal > 0) {
+                                liabilitiesArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
+                            }
+                            else {
+                                liabilitiesArr[i].push(valuationsSortedByDate[currentVal].newBalance)
+                            }
+                        }
                     }
                 }
                 else if (accounts[i].type === "Asset") {
-                    assetsArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
+                    if (currentVal > 0) {
+                        assetsArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
+                    }
+                    else {
+                        assetsArr[i].push(valuationsSortedByDate[currentVal].newBalance)
+                    }
                 }
                 else if (accounts[i].type === "Liability") {
-                    liabilitiesArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
+                    if (currentVal > 0) {
+                        if (currentVal > 0) {
+                            liabilitiesArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
+                        }
+                        else {
+                            liabilitiesArr[i].push(valuationsSortedByDate[currentVal].newBalance)
+                        }
+                    }
                 }
             }
         }
@@ -137,7 +163,7 @@ class AccountChart extends Component {
                 netWorthByMonth.push(assetsByMonth[i] - liabilitiesByMonth[i]);
             }
             else if (assetsByMonth.length > 0) {
-                
+
                 netWorthByMonth.push(assetsByMonth[i])
             }
             else if (liabilitiesByMonth.length > 0) {
@@ -176,4 +202,4 @@ class AccountChart extends Component {
     }
 }
 
-export default AccountChart;
+export default NetWorthChart;
