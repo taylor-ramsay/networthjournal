@@ -7,6 +7,8 @@ import AccountForm from './components/AccountForm'
 import AccountsList from './components/AccountsList'
 import AccountChart from './components/AccountChart'
 import NetWorthChart from './components/NetWorthChart'
+import JournalEntryForm from './components/JournalEntryForm'
+import JournalEntryList from './components/JournalEntryList'
 import axios from 'axios'
 import uniqid from 'uniqid'
 import _ from 'lodash'
@@ -43,9 +45,15 @@ class App extends Component {
         timeStamp: "",
         valuationId: ""
       }],
+      currentMonthlyJournal: {
+        entry: "",
+        date: moment().format("MMM YYYY"),
+        timeStamp: "",
+        journalId: uniqid()
+      },
       monthlyJournal: [{
         entry: "",
-        date: moment().format("MMM DD, YYYY"),
+        date: moment().format("MMM YYYY"),
         timeStamp: moment(),
         journalId: uniqid()
       }]
@@ -58,13 +66,20 @@ class App extends Component {
         this.setState({
           accounts: result.data
         })
-        console.log(result.data)
       })
       .then(result => {
         axios.get('http://localhost:8080/get-valuations')
           .then(result => {
             this.setState({
               valuations: result.data
+            })
+          })
+      })
+      .then(result => {
+        axios.get('http://localhost:8080/get-journals')
+          .then(result => {
+            this.setState({
+              monthlyJournal: result.data
             })
           })
       })
@@ -197,7 +212,15 @@ class App extends Component {
               let accountsFromServer = result.data
               this.setState({
                 accounts: accountsFromServer,
-                valuations: newValuation
+              })
+            })
+        })
+        .then(result => {
+          axios.get('http://localhost:8080/get-valuations')
+            .then(result => {
+              let valuationsFromServer = result.data
+              this.setState({
+                valuations: valuationsFromServer,
               })
             })
         })
@@ -240,6 +263,15 @@ class App extends Component {
                   })
               })
           })
+          .then(result => {
+            axios.get('http://localhost:8080/get-valuations')
+              .then(result => {
+                let valuationsFromServer = result.data
+                this.setState({
+                  valuations: valuationsFromServer,
+                })
+              })
+          })
           .catch(error => {
             console.log(error)
           })
@@ -270,31 +302,50 @@ class App extends Component {
     }
   }
 
-  getCurrentNetWorth() {
-    //Push valuations arrays into accounts objects as valuationAmounts
-    let accounts = this.state.accounts
-    let valuations = this.state.valuations
-
-    for (let i = 0; i < accounts.length; i++) {
-      let newVal = accounts[i].valuationAmounts = []
-      for (let j = 0; j < accounts[i].valuations.length; j++) {
-        for (let k = 0; k < valuations.length; k++) {
-          if (accounts[i].valuations[j] === valuations[k]._id) {
-            accounts[i].valuationAmounts.push(valuations[k])
-          }
-        }
+  handleJournalEntryChange = (e) => {
+    this.setState({
+      currentMonthlyJournal:{
+        entry: e.target.value,
+        date: this.state.currentMonthlyJournal.date,
+        timeStamp: this.state.currentMonthlyJournal.timeStamp,
+        journalId: this.state.currentMonthlyJournal.journalId
       }
-    }
+    })
+  }
 
-    //Get latest valuation for each account each month
-     for (let i = 0; i < accounts.length; i++) {
-      var valuationsSortedByDate = _.sortBy(accounts[i].valuationAmounts, ['_id', 'newDate'])
-      console.log(valuationsSortedByDate[0])
+  handleJournalEntryDateChange = (e) => {
+    this.setState({
+      currentMonthlyJournal:{
+        entry: this.state.currentMonthlyJournal.entry,
+        date: moment(document.getElementById('date').value).format("MMM YYYY"),
+        timeStamp: this.state.currentMonthlyJournal.timeStamp,
+        journalId: this.state.currentMonthlyJournal.journalId,
+      }
+    })
+  }
+
+  handleJournalSubmit = (e) => {
+    e.preventDefault()
+    let formSubmissionValues = {
+      entry: this.state.currentMonthlyJournal.entry,
+      date: this.state.currentMonthlyJournal.date,
+      timeStamp: this.state.currentMonthlyJournal.timeStamp,
+      journalId: this.state.currentMonthlyJournal.journalId
     }
+    console.log(formSubmissionValues)
+    axios.post('http://localhost:8080/add-journal-entry', formSubmissionValues)
+    .then(result => {
+      axios.get('http://localhost:8080/get-journals')
+        .then(result => {
+          let journalsFromServer = result.data
+          this.setState({
+            monthlyJournal: journalsFromServer,
+          })
+        })
+    })
   }
 
   render() {
-    this.getCurrentNetWorth()
     return (
       <div className="container">
         <Switch>
@@ -303,10 +354,12 @@ class App extends Component {
               <Route path="/" render={() => { return <AccountsList accounts={this.state.accounts} editButtonHandler={this.editButtonHandler} addButtonHandler={this.addButtonHandler} /> }} />
               <Route path="/" render={() => { return <AccountChart accounts={this.state.accounts} valuations={this.state.valuations} /> }} />
               <Route path="/" render={() => { return <NetWorthChart accounts={this.state.accounts} valuations={this.state.valuations} /> }} />
+              <Route path="/" render={() => { return <JournalEntryList monthlyJournal={this.state.monthlyJournal} accounts={this.state.accounts} valuations={this.state.valuations} /> }} />
             </div>
             <div className="col s4">
               <Route path="/add-account" render={(props) => { return <AccountForm propsFromParent={props} handleSubmit={this.handleSubmit} currentAccount={this.state.currentAccount} getCurrentAccount={this.getCurrentAccount} _id={this.state.currentAccount._id} balance={this.state.currentAccount.balance} name={this.state.currentAccount.name} type={this.state.currentAccount.type} subType={this.state.currentAccount.subType} date={this.state.currentAccount.date} timeStamp={this.state.currentAccount.timeStamp} handleNameChange={this.handleNameChange} handleBalanceChange={this.handleBalanceChange} handleTypeChange={this.handleTypeChange} handleSubtypeChange={this.handleSubtypeChange} handleDateChange={this.handleDateChange} /> }} />
               <Route path="/edit-account" render={(props) => { return <AccountForm propsFromParent={props} handleSubmit={this.handleSubmit} currentAccount={this.state.currentAccount} getCurrentAccount={this.getCurrentAccount} _id={this.state.currentAccount._id} balance={this.state.currentAccount.balance} name={this.state.currentAccount.name} type={this.state.currentAccount.type} subType={this.state.currentAccount.subType} date={this.state.currentAccount.date} timeStamp={this.state.currentAccount.timeStamp} handleNameChange={this.handleNameChange} handleBalanceChange={this.handleBalanceChange} handleTypeChange={this.handleTypeChange} handleSubtypeChange={this.handleSubtypeChange} handleDateChange={this.handleDateChange} /> }} />
+              <Route path="/journal-entry" render={() => { return <JournalEntryForm handleJournalSubmit={this.handleJournalSubmit} handleJournalEntryChange={this.handleJournalEntryChange} handleJournalEntryDateChange={this.handleJournalEntryDateChange} date={this.state.currentMonthlyJournal.date} entry={this.state.currentMonthlyJournal.entry} /> }} />
             </div>
           </div>
         </Switch>

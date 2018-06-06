@@ -1,59 +1,21 @@
 import React, { Component } from 'react';
-import { Line } from 'react-chartjs-2';
 import moment from 'moment'
 import _ from 'lodash'
 
-class AccountChart extends Component {
-
+class JournalEntryList extends Component {
     render() {
 
         //Defining props
+        let monthlyJournal = this.props.monthlyJournal
         let accounts = this.props.accounts
         let valuations = this.props.valuations
 
-        //Push valuations arrays into accounts objects as valuationAmounts
-        for (let i = 0; i < accounts.length; i++) {
-            let newVal = accounts[i].valuationAmounts = []
-            for (let j = 0; j < accounts[i].valuations.length; j++) {
-                for (let k = 0; k < valuations.length; k++) {
-                    if (accounts[i].valuations[j] === valuations[k]._id) {
-                        accounts[i].valuationAmounts.push(valuations[k])
-                    }
-                }
-            }
-        }
-
         let netWorthByMonth = []
-
-        //Creating chart data for all accounts
         let labelArr = []
         let datasetArr = []
         let dateArr = []
         let dateArrPlot = []
 
-        let datasetObj = {
-            label: 'Networth',
-            fill: false,
-            lineTension: 0.1,
-            backgroundColor: 'rgba(75,192,192,0.4)',
-            borderColor: 'rgba(75,192,192,1)',
-            borderCapStyle: 'butt',
-            borderDash: [],
-            borderDashOffset: 0.0,
-            borderJoinStyle: 'miter',
-            pointBorderColor: 'rgba(75,192,192,1)',
-            pointBackgroundColor: '#fff',
-            pointBorderWidth: 1,
-            pointHoverRadius: 5,
-            pointHoverBackgroundColor: 'rgba(75,192,192,1)',
-            pointHoverBorderColor: 'rgba(220,220,220,1)',
-            pointHoverBorderWidth: 2,
-            pointRadius: 5,
-            pointHitRadius: 10,
-            data: netWorthByMonth
-        }
-        datasetArr.push(datasetObj)
-        
         //Push ALL valuation dates into an array
         for (let i = 0; i < accounts.length; i++) {
             for (let j = 0; j < accounts[i].valuationAmounts.length; j++) {
@@ -137,7 +99,7 @@ class AccountChart extends Component {
                 netWorthByMonth.push(assetsByMonth[i] - liabilitiesByMonth[i]);
             }
             else if (assetsByMonth.length > 0) {
-                
+
                 netWorthByMonth.push(assetsByMonth[i])
             }
             else if (liabilitiesByMonth.length > 0) {
@@ -151,29 +113,50 @@ class AccountChart extends Component {
             datasets: datasetArr
         };
 
-        //Chart options
-        const options = {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }],
-                xAxes: [{
-                    distribution: 'series',
-                    time: {
-                        unit: 'month'
-                    }
-                }]
+
+        let journalsJSX = labelArr.map((label, i) => {
+
+            for(let j = 0; j<monthlyJournal.length; j++){
+                console.log(monthlyJournal[j].date)
+                console.log(labelArr[i])
+                if(moment(monthlyJournal[j].date).format("MM/YYYY") == labelArr[i]){
+                    var journalEntry = monthlyJournal[j].entry 
+                } 
             }
-        }
+
+            if(i === 0){
+                var changeInNetWorth = 0
+            }
+            else{
+                var changeInNetWorth = ((netWorthByMonth[i]-netWorthByMonth[i-1])/netWorthByMonth[i])*100
+            }
+            
+            return (
+                <tr>
+                    <td>{labelArr[i]}</td>
+                    <td>{journalEntry}</td>
+                    <td>${netWorthByMonth[i]}.00</td>
+                    <td>{parseFloat(changeInNetWorth).toFixed(0)}%</td>
+                </tr>
+            )
+        })
 
         return (
-            <div>
-                <Line data={data} width={1000} height={800} options={options} />
-            </div>
-        )
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Journal Entry</th>
+                        <th>Networth</th>
+                        <th>% change</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {journalsJSX}
+                </tbody>
+            </table>
+        );
     }
 }
 
-export default AccountChart;
+export default JournalEntryList;

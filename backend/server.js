@@ -112,6 +112,31 @@ app.put('/add-valuation', (req, res) => {
     })
 })
 
+//Create new journal entry
+app.post('/add-journal-entry', (req, res) => {
+    console.log('hit!')
+    let newJournal = MonthlyJournal(req.body)
+    console.log(newJournal)
+    newJournal.save()
+        .then(savedJournal => {
+            res.json(savedJournal)
+        })
+        .catch(error => {
+            console.log(error)
+        })
+})
+
+//Get all journal entrys
+app.get('/get-journals', (req, res) => {
+    MonthlyJournal.find({})
+        .then(results => {
+            res.json(results)
+        })
+        .catch(error => {
+            console.log(error)
+        })
+})
+
 //Port 8080
 app.listen(8080, () => {
     console.log('server is live at 8080')

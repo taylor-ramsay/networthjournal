@@ -13,7 +13,6 @@ const monthlyJournalSchema = new Schema({
     timeStamp: Date,
     journalId: {
         type: String,
-        required: true
     }
 })
 
