@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import moment from 'moment'
 import _ from 'lodash'
+import { Link } from 'react-router-dom'
 
 class JournalEntryList extends Component {
 
@@ -168,21 +169,26 @@ class JournalEntryList extends Component {
                 var changeInNetWorth = 0
             }
             else {
-                var changeInNetWorth = ((netWorthByMonth[i] - netWorthByMonth[i - 1]) / netWorthByMonth[i]) * 100
+                var changeInNetWorth = ((netWorthByMonth[i] - netWorthByMonth[i - 1]) / netWorthByMonth[i - 1]) * 100
             }
+
+            console.log(changeInNetWorth)
 
             return (
                 <tr>
                     <td>{labelArr[i]}</td>
                     <td>{journalEntry}</td>
                     <td>${netWorthByMonth[i]}.00</td>
-                    <td>{parseFloat(changeInNetWorth).toFixed(0)}%</td>
+                    <td className={changeInNetWorth === 0 ? '' : changeInNetWorth >0 ? "asset": "liability"}>{parseFloat(changeInNetWorth).toFixed(0)}%</td>
                 </tr>
             )
         })
 
         if (monthlyJournal) {
             return (
+                <div>
+                <h5>Net Worth Journal</h5>
+                <a href="/journal-entry"><Link className="add-link" to="/journal-entry"> create new journal entry</Link></a>
                 <table>
                     <thead>
                         <tr>
@@ -196,11 +202,12 @@ class JournalEntryList extends Component {
                         {journalsJSX}
                     </tbody>
                 </table>
+                </div>
             );
         }
         else {
             return (
-                <div><p>hello</p></div>
+                <div></div>
             )
         }
     }

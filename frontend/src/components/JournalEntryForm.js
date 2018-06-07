@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import moment from 'moment'
-import _ from 'lodash'
-
 
 class JournalEntryForm extends Component {
 
@@ -12,6 +10,7 @@ class JournalEntryForm extends Component {
     render() {
         return (
             <div onClick={(e) => { this.props.handleJournalEntryDateChange(e) }}>
+                <h4>Record Journal Entry</h4>
                 <div className="row">
                     <form className="col s12" onSubmit={(e) => { this.props.handleJournalSubmit(e) }}>
                         <div className="row">

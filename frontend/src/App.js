@@ -253,6 +253,12 @@ class App extends Component {
   editAccount = (currentAccountId, formSubmissionValues) => {
     return axios.put('http://localhost:8080/edit-account/' + currentAccountId, formSubmissionValues);
   }
+  deleteAccount = (currentAccountId) => {
+    return axios.delete('http://localhost:8080/delete-account/' + currentAccountId);
+  }
+  deleteValuation = (currentAccountId) => {
+    return axios.delete('http://localhost:8080/delete-valuations/' + currentAccountId);
+  }
 
   handleSubmit = (e, urlLocation) => {
     e.preventDefault()
@@ -281,6 +287,16 @@ class App extends Component {
                 accounts: getAcc.data,
                 valuations: getVal.data,
                 monthlyJournal: getJour.data,
+                currentAccount: {
+                  _id: null,
+                  balance: 0,
+                  name: "",
+                  type: "",
+                  subType: "",
+                  date: moment().format("MMM YYYY"),
+                  timeStamp: moment(),
+                  accountId: uniqid()
+                }
               })
             }))
         }))
@@ -346,6 +362,23 @@ class App extends Component {
     }
   }
 
+  handleDeleteAccount = (accountId) => {
+    axios.all([this.deleteAccount(accountId), this.deleteValuation(accountId)])
+      .then(axios.spread((delAcc, delVal) => {
+        axios.all([this.getAccounts(), this.getValuations(), this.getJournals()])
+          .then(axios.spread((getAcc, getVal, getJour) => {
+            this.setState({
+              accounts: getAcc.data,
+              valuations: getVal.data,
+              monthlyJournal: getJour.data
+            })
+          }))
+      }))
+      .catch(error => {
+        console.log(error)
+      })
+  }
+
   handleJournalEntryChange = (e) => {
     this.setState({
       currentMonthlyJournal: {
@@ -394,19 +427,17 @@ class App extends Component {
         <nav>
           <div className="nav-wrapper">
             <a href="#!" className="brand-logo">Networth Journal</a>
-            <ul className="right hide-on-med-and-down">
-              <li><a href="sass.html">Sass</a></li>
-              <li><a href="badges.html">Components</a></li>
-            </ul>
           </div>
         </nav>
         <div className="container">
           <Switch>
             <div className="row">
               <div className="col s8">
-                <Route path="/" render={() => { return <AccountsList accounts={this.state.accounts} editButtonHandler={this.editButtonHandler} addButtonHandler={this.addButtonHandler} /> }} />
-        <button className="waves-effect waves-light btn-small" onClick={this.handleAccountChart}>Accounts Chart</button>
-        <button className="waves-effect waves-light btn-small" onClick={this.handleNetWorthChart}>NetWorth Chart</button>
+                <Route path="/" render={() => { return <AccountsList accounts={this.state.accounts} editButtonHandler={this.editButtonHandler} addButtonHandler={this.addButtonHandler} handleDeleteAccount={this.handleDeleteAccount} /> }} />
+                <div class="button-box">
+                  <button className="waves-effect waves-light btn-small" onClick={this.handleNetWorthChart}>NetWorth Chart</button>
+                  <button className="waves-effect waves-light btn-small" onClick={this.handleAccountChart}>Accounts Chart</button>
+                </div>
                 {this.state.accountChart.active && <Route path="/" render={() => { return <AccountChart accounts={this.state.accounts} valuations={this.state.valuations} /> }} />}
                 {this.state.netWorthChart.active && <Route path="/" render={() => { return <NetWorthChart accounts={this.state.accounts} valuations={this.state.valuations} /> }} />}
                 <Route path="/" render={() => { return <JournalEntryList monthlyJournal={this.state.monthlyJournal} accounts={this.state.accounts} valuations={this.state.valuations} /> }} />

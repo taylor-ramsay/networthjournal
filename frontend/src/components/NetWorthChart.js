@@ -31,17 +31,19 @@ class NetWorthChart extends Component {
         let dateArr = []
         let dateArrPlot = []
 
+        
+
         let datasetObj = {
             label: 'Networth',
             fill: false,
             lineTension: 0.1,
-            backgroundColor: 'rgba(75,192,192,0.4)',
+            backgroundColor: '#71F6B3',
             borderColor: '#35BC70',
             borderCapStyle: 'butt',
             borderDash: [],
             borderDashOffset: 0.0,
             borderJoinStyle: 'miter',
-            pointBorderColor: 'rgba(75,192,192,1)',
+            pointBorderColor: '#35BC70',
             pointBackgroundColor: '#fff',
             pointBorderWidth: 1,
             pointHoverRadius: 5,
@@ -194,6 +196,7 @@ class NetWorthChart extends Component {
 
         return (
             <div>
+                <h5>Net Worth Chart</h5>
                 <Line data={data} width={1000} height={800} options={options} />
             </div>
         )

@@ -65,13 +65,13 @@ class AccountChart extends Component {
                 label: accounts[i].name,
                 fill: false,
                 lineTension: 0.1,
-                backgroundColor: 'rgba(75,192,192,0.4)',
-                borderColor: '#35BC70',
+                backgroundColor: accounts[i].type === 'Asset' ? '#71F6B3': '#EDABEA',
+                borderColor: accounts[i].type === 'Asset' ? '#35BC70': '#FF7D90',
                 borderCapStyle: 'butt',
                 borderDash: [],
                 borderDashOffset: 0.0,
                 borderJoinStyle: 'miter',
-                pointBorderColor: 'rgba(75,192,192,1)',
+                pointBorderColor: accounts[i].type === 'Asset' ? '#35BC70': '#FF7D90',
                 pointBackgroundColor: '#fff',
                 pointBorderWidth: 1,
                 pointHoverRadius: 5,
@@ -130,6 +130,7 @@ class AccountChart extends Component {
 
         return (
             <div>
+                <h5>Accounts Chart</h5>
                 <Line data={data} width={1000} height={800} options={options} />
             </div>
         );

@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import moment from 'moment'
-import $ from "jquery"
 
 class AccountForm extends Component {
 
@@ -12,6 +11,7 @@ class AccountForm extends Component {
         let urlPath = this.props.propsFromParent.location.pathname
         return (
             <div onClick={(e)=>{this.props.handleDateChange(e)}}>
+            <h4>{this.props.propsFromParent.location.pathname === "/add-account" ? "Add a New account" : "Edit Account"}</h4>
                 <div className="row">
                     <form onSubmit={(e)=>{this.props.handleSubmit(e, urlPath)}} className="col s12">
                         <div className="row">
@@ -32,10 +32,12 @@ class AccountForm extends Component {
                         </div>
                         <div className="row">
                             <div className="input-field col s12">
+                            {console.log(this.props.subType)}
                                 <select value={this.props.subType} onChange={(e) => { this.props.handleSubtypeChange(e) }}>
-                                    <option>Choose your option</option>
+                                    <option value="">Choose your option</option>
                                     <option value={"Credit Card"}>Credit Card</option>
                                     <option value={"Loan"}>Loan</option>
+                                    <option value={"Cash"}>Cash</option>
                                     <option value={"Mortgage"}>Mortgage</option>
                                     <option value={"Investment"}>Investment</option>
                                     <option value={"Real Estate"}>Real Estate</option>

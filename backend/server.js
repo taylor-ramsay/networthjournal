@@ -125,7 +125,7 @@ app.put('/edit-valuation/:valId', (req, res) => {
         newDate: __object.newDate,
         timeStamp: __object.timeStamp,
         valuationId: __object.valuationId
-      }
+    }
     Valuation.findOneAndUpdate(valuationToUpdate, update, { new: true, runValidators: true })
         .then(updatedValuation => {
             res.json(updatedValuation)
@@ -160,6 +160,31 @@ app.get('/get-journals', (req, res) => {
         .catch(error => {
             console.log(error)
         })
+})
+
+//Delete account
+app.delete('/delete-account/:accountId', (req, res) => {
+    let accountToDelete = { "accountId": req.params.accountId }
+    Account.findOneAndRemove(accountToDelete)
+    .then(removedAccount => {
+        res.json(removedAccount)
+    })
+    .catch(err => {
+        console.log(err);
+    })
+})
+
+//Delete valuations
+app.delete('/delete-valuations/:accountId', (req, res) => {
+    console.log("DELETE VAL")
+    let valuationToDelete = { "accountId": req.params.accountId }
+    Valuation.remove(valuationToDelete)
+    .then(removedValuations => {
+        res.json(removedValuations)
+    })
+    .catch(err => {
+        console.log(err);
+    })
 })
 
 //Port 8080
