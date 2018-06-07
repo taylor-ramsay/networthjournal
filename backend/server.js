@@ -63,7 +63,7 @@ app.get('/get-valuations', (req, res) => {
         })
 })
 
-//Update account
+//Edit account
 app.put('/edit-account/:accountId', (req, res) => {
     console.log(req.body)
     __object = req.body
@@ -89,12 +89,13 @@ app.put('/edit-account/:accountId', (req, res) => {
 })
 
 //create a valuation and assign to account
-app.put('/add-valuation', (req, res) => {
+app.post('/add-valuation', (req, res) => {
     let newValuation = Valuation({
         newBalance: req.body.newBalance,
         newDate: req.body.newDate,
         timeStamp: req.body.timeStamp,
-        valuationId: req.body.valuationId
+        valuationId: req.body.valuationId,
+        accountId: req.body.accountId
     })
     newValuation.save(function (err, val) {
         const valuationId = val.id;
@@ -110,6 +111,30 @@ app.put('/add-valuation', (req, res) => {
                 console.log(error);
             })
     })
+})
+
+//Edit valuation
+app.put('/edit-valuation/:valId', (req, res) => {
+    console.log(req.body)
+    __object = req.body
+    let valuationToUpdate = { "valId": req.params.valuationId }
+    console.log(valuationToUpdate)
+    let update = {
+        accountId: __object.accountId,
+        newBalance: __object.newBalance,
+        newDate: __object.newDate,
+        timeStamp: __object.timeStamp,
+        valuationId: __object.valuationId
+      }
+    Valuation.findOneAndUpdate(valuationToUpdate, update, { new: true, runValidators: true })
+        .then(updatedValuation => {
+            res.json(updatedValuation)
+            "UPDATED!!"
+        })
+        .catch(error => {
+            console.log(error)
+            res.status(400).json({ error })
+        })
 })
 
 //Create new journal entry

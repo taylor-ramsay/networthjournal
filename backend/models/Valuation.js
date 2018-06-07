@@ -14,6 +14,9 @@ const valuationSchema = new Schema({
     valuationId: {
         type: String,
         required: true,
+    },
+    accountId: {
+        type: String,
     }
 })
 

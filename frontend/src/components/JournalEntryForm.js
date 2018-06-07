@@ -2,11 +2,15 @@ import React, { Component } from 'react';
 import moment from 'moment'
 import _ from 'lodash'
 
+
 class JournalEntryForm extends Component {
+
+    componentDidMount(){
+        window.initMaterialize()
+    }
+
     render() {
-
         return (
-
             <div onClick={(e) => { this.props.handleJournalEntryDateChange(e) }}>
                 <div className="row">
                     <form className="col s12" onSubmit={(e) => { this.props.handleJournalSubmit(e) }}>

@@ -15,15 +15,12 @@ class AccountsList extends Component {
                 liabilityValues.push(account.balance)
             }
             return (
-                <li className="collection-item"><div>{account.name} <a className="secondary-content" className="edit-link" onClick={() => { this.props.editButtonHandler(account._id) }}><Link className="edit-link" to="/edit-account">edit</Link></a><span className="secondary-content">${account.balance}.00</span></div></li>
+                <li className="collection-item"><div>{account.name} <a className="secondary-content" className="edit-link" onClick={() => { this.props.editButtonHandler(account.accountId, account.date) }}><Link className="edit-link" to="/edit-account">edit</Link></a><span className="secondary-content">${account.balance}.00</span></div></li>
             ) 
         })
         let assetValuesTotal = assetValues.reduce(function(acc, val) { return acc + val; }, 0);
         let liabilityValuesTotal = liabilityValues.reduce(function(acc, val) { return acc + val; }, 0);
         let netWorthTotal = assetValuesTotal-liabilityValuesTotal
-        console.log(assetValues)
-        console.log(liabilityValues)
-
 
         return (
             <div>

@@ -36,7 +36,7 @@ class NetWorthChart extends Component {
             fill: false,
             lineTension: 0.1,
             backgroundColor: 'rgba(75,192,192,0.4)',
-            borderColor: 'rgba(75,192,192,1)',
+            borderColor: '#35BC70',
             borderCapStyle: 'butt',
             borderDash: [],
             borderDashOffset: 0.0,
@@ -85,7 +85,7 @@ class NetWorthChart extends Component {
         for (let i = 0; i < accounts.length; i++) {
             assetsArr[i] = []
             liabilitiesArr[i] = []
-            var valuationsSortedByDate = _.sortBy(accounts[i].valuationAmounts, ['_id', 'newDate'])
+            var valuationsSortedByDate = _.sortBy(accounts[i].valuationAmounts, ['_id', 'timeStamp'])
 
             let currentVal = 0
             //Push account value by month into their respective arrays
@@ -96,8 +96,6 @@ class NetWorthChart extends Component {
                         currentVal = currentVal + 1
                     }
                     else if (labelArr[j] != moment(valuationsSortedByDate[currentVal].newDate).format('MM/YYYY') && accounts[i].type === "Asset") {
-                        console.log(currentVal)
-                        //console.log(valuationsSortedByDate[currentVal-1].newBalance)
                         if (currentVal > 0) {
                             assetsArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
                         }

@@ -5,7 +5,7 @@ import $ from "jquery"
 class AccountForm extends Component {
 
     componentDidMount(){
-        window.test()
+        window.initMaterialize()
     }
 
     render() {

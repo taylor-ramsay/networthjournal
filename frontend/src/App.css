@@ -1,3 +1,26 @@
+/*
+#40CFFF - Blue
+#FF7D90 - Redish
+#4EB978 - Green
+*/
+
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: 'ABeeZee', sans-serif;
+}
+
+.container{
+  margin-top: 20px;
+}
+
+nav{
+  box-shadow: none;
+  background-color: #354A53
+}
+
 .App {
   text-align: center;
 }
@@ -25,4 +48,16 @@
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+.secondary-content {
+  color: #4EB978
+}
+
+.btn, .btn-large, .btn-small {
+  background-color: #35BC70;
+}
+
+.btn:hover, .btn-large:hover, .btn-small:hover{
+  background-color: #49C088;
 }

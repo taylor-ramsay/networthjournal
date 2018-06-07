@@ -3,12 +3,19 @@ import moment from 'moment'
 import _ from 'lodash'
 
 class JournalEntryList extends Component {
+
+    componentDidUpdate() {
+        window.initMaterialize()
+    }
+
     render() {
+
 
         //Defining props
         let monthlyJournal = this.props.monthlyJournal
         let accounts = this.props.accounts
         let valuations = this.props.valuations
+
 
         let netWorthByMonth = []
         let labelArr = []
@@ -16,13 +23,24 @@ class JournalEntryList extends Component {
         let dateArr = []
         let dateArrPlot = []
 
+        //Push valuations arrays into accounts objects as valuationAmounts
+        for (let i = 0; i < accounts.length; i++) {
+            let newVal = accounts[i].valuationAmounts = []
+            for (let j = 0; j < accounts[i].valuations.length; j++) {
+                for (let k = 0; k < valuations.length; k++) {
+                    if (accounts[i].valuations[j] === valuations[k]._id) {
+                        accounts[i].valuationAmounts.push(valuations[k])
+                    }
+                }
+            }
+        }
+
         //Push ALL valuation dates into an array
         for (let i = 0; i < accounts.length; i++) {
             for (let j = 0; j < accounts[i].valuationAmounts.length; j++) {
                 var dates = accounts[i].valuationAmounts[j].newDate
                 dateArr.push(dates)
             }
-
         }
 
         //Find the earliest date and the last date and create an array of months within that range for x-axis
@@ -47,7 +65,7 @@ class JournalEntryList extends Component {
         for (let i = 0; i < accounts.length; i++) {
             assetsArr[i] = []
             liabilitiesArr[i] = []
-            var valuationsSortedByDate = _.sortBy(accounts[i].valuationAmounts, ['_id', 'newDate'])
+            var valuationsSortedByDate = _.sortBy(accounts[i].valuationAmounts, ['_id', 'timeStamp'])
 
             let currentVal = 0
             //Push account value by month into their respective arrays
@@ -58,8 +76,6 @@ class JournalEntryList extends Component {
                         currentVal = currentVal + 1
                     }
                     else if (labelArr[j] != moment(valuationsSortedByDate[currentVal].newDate).format('MM/YYYY') && accounts[i].type === "Asset") {
-                        console.log(currentVal)
-                        //console.log(valuationsSortedByDate[currentVal-1].newBalance)
                         if (currentVal > 0) {
                             assetsArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
                         }
@@ -142,19 +158,19 @@ class JournalEntryList extends Component {
 
         let journalsJSX = labelArr.map((label, i) => {
 
-            for(let j = 0; j<monthlyJournal.length; j++){
-                if(moment(monthlyJournal[j].date).format("MM/YYYY") == labelArr[i]){
-                    var journalEntry = monthlyJournal[j].entry 
-                } 
+            for (let j = 0; j < monthlyJournal.length; j++) {
+                if (moment(monthlyJournal[j].date).format("MM/YYYY") == labelArr[i]) {
+                    var journalEntry = monthlyJournal[j].entry
+                }
             }
 
-            if(i === 0){
+            if (i === 0) {
                 var changeInNetWorth = 0
             }
-            else{
-                var changeInNetWorth = ((netWorthByMonth[i]-netWorthByMonth[i-1])/netWorthByMonth[i])*100
+            else {
+                var changeInNetWorth = ((netWorthByMonth[i] - netWorthByMonth[i - 1]) / netWorthByMonth[i]) * 100
             }
-            
+
             return (
                 <tr>
                     <td>{labelArr[i]}</td>
@@ -165,21 +181,28 @@ class JournalEntryList extends Component {
             )
         })
 
-        return (
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Journal Entry</th>
-                        <th>Networth</th>
-                        <th>% change</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {journalsJSX}
-                </tbody>
-            </table>
-        );
+        if (monthlyJournal) {
+            return (
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Journal Entry</th>
+                            <th>Networth</th>
+                            <th>% change</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {journalsJSX}
+                    </tbody>
+                </table>
+            );
+        }
+        else {
+            return (
+                <div><p>hello</p></div>
+            )
+        }
     }
 }
 
