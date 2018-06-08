@@ -172,8 +172,6 @@ class JournalEntryList extends Component {
                 var changeInNetWorth = ((netWorthByMonth[i] - netWorthByMonth[i - 1]) / netWorthByMonth[i - 1]) * 100
             }
 
-            console.log(changeInNetWorth)
-
             return (
                 <tr>
                     <td>{labelArr[i]}</td>

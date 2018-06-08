@@ -32,9 +32,8 @@ class AccountForm extends Component {
                         </div>
                         <div className="row">
                             <div className="input-field col s12">
-                            {console.log(this.props.subType)}
                                 <select value={this.props.subType} onChange={(e) => { this.props.handleSubtypeChange(e) }}>
-                                    <option value="">Choose your option</option>
+                                    <option value={"1"} id="option1">Choose your option</option>
                                     <option value={"Credit Card"}>Credit Card</option>
                                     <option value={"Loan"}>Loan</option>
                                     <option value={"Cash"}>Cash</option>

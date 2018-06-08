@@ -8,11 +8,9 @@ class AccountsList extends Component {
         let assetValues = []
         let liabilityValues = []
         let accounts = this.props.accounts
-        let sortedAccounts = accounts.sort(function (a, b) {
-            if (a.type < b.type) return -1;
-            if (a.type > b.type) return 1;
-            return 0;
-        });
+        // let sortedAccounts = accounts.sort(function(a, b){
+        //     return a.type == b.type ? 0 : +(a.type > b.type) || -1;
+        //   });
         let accountsJSX = accounts.map((account, i) => {
             if (account.type === "Asset") {
                 assetValues.push(account.balance)

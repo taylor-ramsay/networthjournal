@@ -290,14 +290,14 @@ class App extends Component {
                 currentAccount: {
                   _id: null,
                   balance: 0,
-                  name: "",
+                  name: null,
                   type: "",
                   subType: "",
                   date: moment().format("MMM YYYY"),
                   timeStamp: moment(),
                   accountId: uniqid()
                 }
-              })
+              }, window.removeSelected())
             }))
         }))
         .catch(error => {

@@ -43,7 +43,7 @@ app.post('/add-account', (req, res) => {
 
 //Get all accounts
 app.get('/get-accounts', (req, res) => {
-    Account.find({})
+    Account.find({}).sort('type')
         .then(results => {
             res.json(results)
         })

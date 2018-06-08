@@ -31,7 +31,7 @@ class NetWorthChart extends Component {
         let dateArr = []
         let dateArrPlot = []
 
-        
+
 
         let datasetObj = {
             label: 'Networth',
@@ -179,6 +179,8 @@ class NetWorthChart extends Component {
 
         //Chart options
         const options = {
+            animation: false,
+            scaleLabel: function (label) { return '$' + label.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); },
             scales: {
                 yAxes: [{
                     ticks: {
