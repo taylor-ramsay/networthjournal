@@ -4,7 +4,7 @@ import moment from 'moment'
 class JournalEntryForm extends Component {
 
     componentDidMount(){
-        window.initMaterialize()
+        //window.initMaterialize()
     }
 
     render() {

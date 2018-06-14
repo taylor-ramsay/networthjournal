@@ -5,10 +5,6 @@ import { Link } from 'react-router-dom'
 
 class JournalEntryList extends Component {
 
-    componentDidUpdate() {
-        window.initMaterialize()
-    }
-
     render() {
 
         //Defining props

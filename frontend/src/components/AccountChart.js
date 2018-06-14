@@ -118,6 +118,7 @@ class AccountChart extends Component {
         return (
             <div>
                 <h5>Accounts Chart</h5>
+                <label>Click account names on legend to filter</label>
                 <Line data={data} width={1000} height={800} options={options} />
             </div>
         );

@@ -40,17 +40,6 @@ app.post('/add-account', (req, res) => {
         })
 })
 
-//Get all accounts
-// app.get('/get-accounts', (req, res) => {
-//     Account.find({}).sort('type')
-//         .then(results => {
-//             res.json(results)
-//         })
-//         .catch(error => {
-//             console.log(error)
-//         })
-// })
-
 //Get all valuations
 app.get('/get-valuations', (req, res) => {
     console.log("GETVALHIT")

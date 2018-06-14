@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import './App.css'
 import { Switch, Link, Route, withRouter } from 'react-router-dom'
 import moment from 'moment'
-import AddAccountForm from './components/AddAccountForm'
 import AccountForm from './components/AccountForm'
 import AccountsList from './components/AccountsList'
 import AccountChart from './components/AccountChart'
@@ -12,6 +11,7 @@ import JournalEntryList from './components/JournalEntryList'
 import axios from 'axios'
 import uniqid from 'uniqid'
 import _ from 'lodash'
+import $ from 'jquery'
 
 class App extends Component {
 
@@ -125,7 +125,7 @@ class App extends Component {
     })
   }
 
-  addButtonHandler = () => {
+  addButtonHandler = (e) => {
     this.setState({
       currentAccount: {
         _id: null,
@@ -292,14 +292,14 @@ class App extends Component {
                 currentAccount: {
                   _id: null,
                   balance: 0,
-                  name: null,
+                  name: "",
                   type: "",
-                  subType: "",
+                  subType: 1,
                   date: moment().format("MMM YYYY"),
                   timeStamp: moment(),
                   accountId: uniqid()
                 }
-              }, window.removeSelected())
+              }, ()=>{ window.initMaterialize()})
             }))
         }))
         .catch(error => {
@@ -490,7 +490,6 @@ class App extends Component {
 
 
   render() {
-    console.log(this.state.valuations)
     return (
       <div>
         <nav>
@@ -503,6 +502,7 @@ class App extends Component {
             <div className="row">
               <div className="col s8">
                 <Route path="/" render={() => { return <AccountsList accounts={this.state.accounts} editButtonHandler={this.editButtonHandler} addButtonHandler={this.addButtonHandler} handleDeleteAccount={this.handleDeleteAccount} /> }} />
+                <label>Click on buttons below to expand</label>
                 <div class="button-box">
                   <button className="waves-effect waves-light btn-small" onClick={this.handleNetWorthChart}>NetWorth Chart</button>
                   <button className="waves-effect waves-light btn-small" onClick={this.handleAccountChart}>Accounts Chart</button>
