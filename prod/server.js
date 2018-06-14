@@ -191,7 +191,7 @@ app.delete('/delete-valuations/:accountId', (req, res) => {
 })
 
 //Link to build dir
-app.use(express.static(__dirname+'/frontend/public'));
+app.use(express.static(__dirname+'/frontend/build'));
 
 //Port 8080
 app.listen(PORT, ()=>{

@@ -230,36 +230,36 @@ class App extends Component {
   }
 
   addAccount = (formSubmissionValues) => {
-    return axios.post('http://localhost:8080/add-account', formSubmissionValues);
+    return axios.post('/add-account', formSubmissionValues);
   }
   getAccounts = () => {
-    return axios.get('http://localhost:8080/get-accounts');
+    return axios.get('/get-accounts');
   }
   getValuations = () => {
-    return axios.get('http://localhost:8080/get-valuations');
+    return axios.get('/get-valuations');
   }
   getJournals = () => {
-    return axios.get('http://localhost:8080/get-journals');
+    return axios.get('/get-journals');
   }
   addAccount = (formSubmissionValues) => {
-    return axios.post('http://localhost:8080/add-account', formSubmissionValues);
+    return axios.post('/add-account', formSubmissionValues);
   }
   addValuation = (newValuation) => {
-    return axios.post('http://localhost:8080/add-valuation', newValuation);
+    return axios.post('/add-valuation', newValuation);
   }
   editValuation = (currentAccountId, newValuation) => {
     console.log(currentAccountId)
     console.log(newValuation)
-    return axios.put('http://localhost:8080/edit-valuation/' + currentAccountId, newValuation);
+    return axios.put('/edit-valuation/' + currentAccountId, newValuation);
   }
   editAccount = (currentAccountId, formSubmissionValues) => {
-    return axios.put('http://localhost:8080/edit-account/' + currentAccountId, formSubmissionValues);
+    return axios.put('/edit-account/' + currentAccountId, formSubmissionValues);
   }
   deleteAccount = (currentAccountId) => {
-    return axios.delete('http://localhost:8080/delete-account/' + currentAccountId);
+    return axios.delete('/delete-account/' + currentAccountId);
   }
   deleteValuation = (currentAccountId) => {
-    return axios.delete('http://localhost:8080/delete-valuations/' + currentAccountId);
+    return axios.delete('/delete-valuations/' + currentAccountId);
   }
 
   handleSubmit = (e, urlLocation) => {
@@ -475,9 +475,9 @@ class App extends Component {
       timeStamp: this.state.currentMonthlyJournal.timeStamp,
       journalId: this.state.currentMonthlyJournal.journalId
     }
-    axios.post('http://localhost:8080/add-journal-entry', formSubmissionValues)
+    axios.post('/add-journal-entry', formSubmissionValues)
       .then(result => {
-        axios.get('http://localhost:8080/get-journals')
+        axios.get('/get-journals')
           .then(result => {
             let journalsFromServer = result.data
             this.setState({
