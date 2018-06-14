@@ -11,18 +11,6 @@ class NetWorthChart extends Component {
         let accounts = this.props.accounts
         let valuations = this.props.valuations
 
-        //Push valuations arrays into accounts objects as valuationAmounts
-        for (let i = 0; i < accounts.length; i++) {
-            let newVal = accounts[i].valuationAmounts = []
-            for (let j = 0; j < accounts[i].valuations.length; j++) {
-                for (let k = 0; k < valuations.length; k++) {
-                    if (accounts[i].valuations[j] === valuations[k]._id) {
-                        accounts[i].valuationAmounts.push(valuations[k])
-                    }
-                }
-            }
-        }
-
         let netWorthByMonth = []
 
         //Creating chart data for all accounts
@@ -30,8 +18,6 @@ class NetWorthChart extends Component {
         let datasetArr = []
         let dateArr = []
         let dateArrPlot = []
-
-
 
         let datasetObj = {
             label: 'Networth',
@@ -58,8 +44,8 @@ class NetWorthChart extends Component {
 
         //Push ALL valuation dates into an array
         for (let i = 0; i < accounts.length; i++) {
-            for (let j = 0; j < accounts[i].valuationAmounts.length; j++) {
-                var dates = accounts[i].valuationAmounts[j].newDate
+            for (let j = 0; j < accounts[i].valuations.length; j++) {
+                var dates = accounts[i].valuations[j].newDate
                 dateArr.push(dates)
             }
 
@@ -87,7 +73,7 @@ class NetWorthChart extends Component {
         for (let i = 0; i < accounts.length; i++) {
             assetsArr[i] = []
             liabilitiesArr[i] = []
-            var valuationsSortedByDate = _.sortBy(accounts[i].valuationAmounts, ['_id', 'timeStamp'])
+            var valuationsSortedByDate = accounts[i].valuations
 
             let currentVal = 0
             //Push account value by month into their respective arrays
@@ -102,7 +88,7 @@ class NetWorthChart extends Component {
                             assetsArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
                         }
                         else {
-                            assetsArr[i].push(valuationsSortedByDate[currentVal].newBalance)
+                            assetsArr[i].push(0)
                         }
                     }
                     else if (labelArr[j] == moment(valuationsSortedByDate[currentVal].newDate).format('MM/YYYY') && accounts[i].type === "Liability") {
@@ -115,7 +101,7 @@ class NetWorthChart extends Component {
                                 liabilitiesArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
                             }
                             else {
-                                liabilitiesArr[i].push(valuationsSortedByDate[currentVal].newBalance)
+                                liabilitiesArr[i].push(0)
                             }
                         }
                     }
@@ -158,7 +144,7 @@ class NetWorthChart extends Component {
         }, []);
 
         //Calculate networth for eachmonth
-        for (var i = 0; i < assetsByMonth.length; i++) {
+        for (var i = 0; i < labelArr.length; i++) {
             if (assetsByMonth.length > 0 && liabilitiesByMonth.length > 0) {
                 netWorthByMonth.push(assetsByMonth[i] - liabilitiesByMonth[i]);
             }
@@ -195,7 +181,7 @@ class NetWorthChart extends Component {
                 }]
             }
         }
-
+        
         return (
             <div>
                 <h5>Net Worth Chart</h5>

@@ -3,7 +3,6 @@ Schema = mongoose.Schema;
 const express = require('express'),
     bodyParser = require('body-parser')
 app = express()
-
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
@@ -42,25 +41,37 @@ app.post('/add-account', (req, res) => {
 })
 
 //Get all accounts
-app.get('/get-accounts', (req, res) => {
-    Account.find({}).sort('type')
-        .then(results => {
-            res.json(results)
-        })
-        .catch(error => {
-            console.log(error)
-        })
-})
+// app.get('/get-accounts', (req, res) => {
+//     Account.find({}).sort('type')
+//         .then(results => {
+//             res.json(results)
+//         })
+//         .catch(error => {
+//             console.log(error)
+//         })
+// })
 
 //Get all valuations
 app.get('/get-valuations', (req, res) => {
-    Valuation.find({})
-        .then(results => {
-            res.json(results)
-        })
-        .catch(error => {
-            console.log(error)
-        })
+    console.log("GETVALHIT")
+    Valuation.find({}).sort('newDate')
+    .then(results => {
+        res.json(results)
+    })
+    .catch(error => {
+        console.log(error)
+    })
+})
+
+//Get accounts with valuations
+app.get('/get-accounts', (req,res) => {
+    Account.find({}).sort('type').populate({path: 'valuations', options: { sort: { 'newDate': 1 } } })
+    .then(results => {
+        res.json(results)
+    })
+    .catch(error => {
+        console.log(error)
+    })
 })
 
 //Edit account
@@ -114,11 +125,12 @@ app.post('/add-valuation', (req, res) => {
 })
 
 //Edit valuation
-app.put('/edit-valuation/:valId', (req, res) => {
-    console.log(req.body)
+app.put('/edit-valuation/:accountId', (req, res) => {
+    console.log("EDIT VAL HIT")
+    console.log("REQ & BODY!!!" + JSON.stringify(req.body))
     __object = req.body
-    let valuationToUpdate = { "valId": req.params.valuationId }
-    console.log(valuationToUpdate)
+    let valuationToUpdate = {$and: [{"accountId": req.params.accountId}, {"newDate":__object.newDate}] }
+    console.log("VAL TO UPDATE" + JSON.stringify(valuationToUpdate))
     let update = {
         accountId: __object.accountId,
         newBalance: __object.newBalance,
@@ -128,8 +140,8 @@ app.put('/edit-valuation/:valId', (req, res) => {
     }
     Valuation.findOneAndUpdate(valuationToUpdate, update, { new: true, runValidators: true })
         .then(updatedValuation => {
+            console.log("EDIT VAL COMPLETE")
             res.json(updatedValuation)
-            "UPDATED!!"
         })
         .catch(error => {
             console.log(error)

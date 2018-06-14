@@ -54,7 +54,7 @@ class App extends Component {
       },
       valuations: [{
         newBalance: 0,
-        newDate: "",
+        newDate: moment().format("MMM YYYY"),
         timeStamp: "",
         valuationId: ""
       }],
@@ -80,7 +80,7 @@ class App extends Component {
         this.setState({
           accounts: getAcc.data,
           valuations: getVal.data,
-          monthlyJournal: getJour
+          monthlyJournal: getJour.data
         })
       }))
       .catch(error => {
@@ -172,7 +172,7 @@ class App extends Component {
         newDate: this.state.currentAccount.date,
         timeStamp: moment(),
         valuationId: uniqid(),
-        accountId: this.state.currentAccount._id
+        accountId: this.state.currentAccount.accountId
       },
     })
   }
@@ -221,10 +221,10 @@ class App extends Component {
       },
       currentValuation: {
         newBalance: this.state.currentAccount.balance,
-        newDate: e.target.value,
+        newDate: moment(e.target.value).format("MMM YYYY"),
         timeStamp: moment(),
         valuationId: uniqid(),
-        accountId: this.state.currentAccount._id
+        accountId: this.state.currentAccount.accountId
       }
     })
   }
@@ -247,8 +247,10 @@ class App extends Component {
   addValuation = (newValuation) => {
     return axios.post('http://localhost:8080/add-valuation', newValuation);
   }
-  editValuation = (currentValuationId, newValuation) => {
-    return axios.put('http://localhost:8080/edit-valuation/' + currentValuationId, newValuation);
+  editValuation = (currentAccountId, newValuation) => {
+    console.log(currentAccountId)
+    console.log(newValuation)
+    return axios.put('http://localhost:8080/edit-valuation/' + currentAccountId, newValuation);
   }
   editAccount = (currentAccountId, formSubmissionValues) => {
     return axios.put('http://localhost:8080/edit-account/' + currentAccountId, formSubmissionValues);
@@ -323,13 +325,36 @@ class App extends Component {
       let dbAccount = this.state.accounts.find((el) => {
         return el.accountId === this.state.currentAccount.accountId
       })
-      let currentAccountMonthYear = moment(this.state.currentAccount.date).format('MMM YYYY')
-      let dbAccountMonthYear = moment(dbAccount.date).format('MMM YYYY')
-      if (currentAccountMonthYear !== dbAccountMonthYear) {
-        console.log("else")
+      let dbValuation = this.state.valuations.find((el) => {
+        return el.accountId === this.state.currentAccount.accountId
+      })
 
+      //Check to see if valuation exists for a given account on a given date
+      let doesValExist = (accountId, date) => {
+        var valFound = false;
+        for (let i = 0; i < this.state.valuations.length; i++) {
+          if (moment(this.state.valuations[i].newDate).format("MMM YYYY") === date && this.state.valuations[i].accountId === accountId) {
+            valFound = true;
+            break;
+          }
+        }
+        return(valFound ? true : false)
+      }
+
+      let currentAccountMonthYear = moment(this.state.currentAccount.date).format('MMYYYY')
+      let currentAccountAccountId = this.state.currentAccount.accountId
+      let dbAccountMonthYear = moment(dbAccount.date).format('MMYYYY')
+      let dbAccountAccountId = dbAccount.accountId
+      let currentValuationAccountID = this.state.currentValuation.accountId
+      let dbValuationAccountID = dbValuation.accountId
+      console.log(currentAccountMonthYear)
+      console.log(dbAccountMonthYear)
+      console.log(currentValuationAccountID)
+      console.log(dbValuationAccountID)
+      if (Number(currentAccountMonthYear) > Number(dbAccountMonthYear) && currentAccountAccountId === dbAccountAccountId && currentValuationAccountID === dbValuationAccountID) {
+        console.log("greater than!!!")
         axios.all([this.editAccount(this.state.currentAccount.accountId, formSubmissionValues), this.addValuation(newValuation)])
-          .then(axios.spread((addAcc, addVal) => {
+          .then(axios.spread((editAcc, addVal) => {
             axios.all([this.getAccounts(), this.getValuations(), this.getJournals()])
               .then(axios.spread((getAcc, getVal, getJour) => {
                 this.setState({
@@ -343,8 +368,49 @@ class App extends Component {
             console.log(error)
           })
       }
-      else {
-        axios.all([this.editAccount(this.state.currentAccount.accountId, formSubmissionValues, this.editValuation(this.state.currentValuation.valuationId, newValuation))])
+      else if (Number(currentAccountMonthYear) < Number(dbAccountMonthYear) && currentAccountAccountId === dbAccountAccountId && currentValuationAccountID === dbValuationAccountID) {
+        console.log("less than")
+        //If valuation does exist then edit valuation
+        if (doesValExist(this.state.currentAccount.accountId, this.state.currentAccount.date)) {
+          console.log(doesValExist(this.state.currentAccount.accountId, this.state.currentAccount.date))
+          this.editValuation(this.state.currentValuation.accountId, newValuation)
+            .then(result => {
+              axios.all([this.getAccounts(), this.getValuations(), this.getJournals()])
+                .then(axios.spread((getAcc, getVal, getJour) => {
+                  this.setState({
+                    accounts: getAcc.data,
+                    valuations: getVal.data,
+                    monthlyJournal: getJour.data
+                  })
+                }))
+            })
+            .catch(error => {
+              console.log(error)
+            })
+        }
+        //If valuation doesn't extist then add valuation
+        else {
+          console.log(doesValExist(this.state.currentAccount.accountId, this.state.currentAccount.date))
+          this.addValuation(newValuation)
+            .then(result => {
+              axios.all([this.getAccounts(), this.getValuations(), this.getJournals()])
+                .then(axios.spread((getAcc, getVal, getJour) => {
+                  this.setState({
+                    accounts: getAcc.data,
+                    valuations: getVal.data,
+                    monthlyJournal: getJour.data
+                  })
+                }))
+            })
+            .catch(error => {
+              console.log(error)
+            })
+        }
+      }
+      else if (Number(currentAccountMonthYear) === Number(dbAccountMonthYear) && currentAccountAccountId === dbAccountAccountId && currentValuationAccountID === dbValuationAccountID && this.state.valuations[this.state.valuations.length - 1]) {
+        console.log("equal to!!!")
+        console.log(this.state.currentAccount.date)
+        axios.all([this.editAccount(this.state.currentAccount.accountId, formSubmissionValues, this.editValuation(this.state.currentValuation.accountId, newValuation))])
           .then(axios.spread((editAcc, editVal) => {
             axios.all([this.getAccounts(), this.getValuations(), this.getJournals()])
               .then(axios.spread((getAcc, getVal, getJour) => {
@@ -421,7 +487,10 @@ class App extends Component {
       })
   }
 
+
+
   render() {
+    console.log(this.state.valuations)
     return (
       <div>
         <nav>

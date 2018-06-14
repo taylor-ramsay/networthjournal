@@ -11,7 +11,7 @@ class AccountForm extends Component {
         let urlPath = this.props.propsFromParent.location.pathname
         return (
             <div onClick={(e)=>{this.props.handleDateChange(e)}}>
-            <h4>{this.props.propsFromParent.location.pathname === "/add-account" ? "Add a New account" : "Edit Account"}</h4>
+            <h4>{this.props.propsFromParent.location.pathname === "/add-account" ? "Add a New Account" : "Edit Account"}</h4>
                 <div className="row">
                     <form onSubmit={(e)=>{this.props.handleSubmit(e, urlPath)}} className="col s12">
                         <div className="row">

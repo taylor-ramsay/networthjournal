@@ -18,17 +18,6 @@ class AccountChart extends Component {
         let accounts = this.props.accounts
         let valuations = this.props.valuations
 
-        //Push valuations arrays into accounts objects as valuationAmounts
-        for (let i = 0; i < accounts.length; i++) {
-            let newVal = accounts[i].valuationAmounts = []
-            for (let j = 0; j < accounts[i].valuations.length; j++) {
-                for (let k = 0; k < valuations.length; k++) {
-                    if (accounts[i].valuations[j] === valuations[k]._id) {
-                        accounts[i].valuationAmounts.push(valuations[k])
-                    }
-                }
-            }
-        }
         //Creating chart data for all accounts
         let labelArr = []
         let datasetArr = []
@@ -38,11 +27,12 @@ class AccountChart extends Component {
         let xyDataArray = []
         //Get dates for all valuations and push into array
         for (let i = 0; i < accounts.length; i++) {
-            for (let j = 0; j < accounts[i].valuationAmounts.length; j++) {
-                var dates = accounts[i].valuationAmounts[j].newDate
+            for (let j = 0; j < accounts[i].valuations.length; j++) {
+                var dates = accounts[i].valuations[j].newDate
                 dateArr.push(dates)
             }
         }
+
         //Find the earliest date and the last date and create an array of months within that range for x-axis
         if (dateArr.length) {
             let sortedDates = dateArr.sort()
@@ -82,18 +72,17 @@ class AccountChart extends Component {
                 pointHitRadius: 10,
                 data: xyDataArray[i]
             }
-            let valuationsSortedByDate = _.sortBy(accounts[i].valuationAmounts, ['_id', 'newDate'])
+            let valuationsSortedByDate = accounts[i].valuations
             for (let j = 0; j < valuationsSortedByDate.length; j++) {
                 if (valuationsSortedByDate[j] === valuationsSortedByDate[valuationsSortedByDate.length-1]) {
                     var xyData = {
                         x: labelArr[labelArr.length-1],
                         y: valuationsSortedByDate[valuationsSortedByDate.length-1].newBalance
                     }
-                    xyDataArray[i].push(xyData)
                 }
                     var xyData = {
                         x: moment(valuationsSortedByDate[j].newDate).format("MM/YYYY"),
-                        y: accounts[i].valuationAmounts[j].newBalance
+                        y: accounts[i].valuations[j].newBalance
                     }
                     xyDataArray[i].push(xyData)
             }
@@ -125,8 +114,6 @@ class AccountChart extends Component {
                 }]
             }
         }
-
-    
 
         return (
             <div>
