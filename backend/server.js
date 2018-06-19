@@ -7,6 +7,19 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 const PORT = process.env.PORT || 8080
+const dev = app.get('env') !== 'production'
+
+if (!dev) {
+    app.disable('x-powered-by')
+    app.use(express.static(__dirname + '/frontend/build'))
+    mongoose.connect(process.env.MONGODB_URI)
+}
+
+if (dev) {
+    app.use(express.static(__dirname + '/frontend/public'));
+    //Mongo DB
+    mongoose.connect('mongodb://localhost/NWJournalDB')
+}
 
 //CORS
 app.use((req, res, next) => {
@@ -15,9 +28,6 @@ app.use((req, res, next) => {
     res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
     next();
 });
-
-//Mongo DB
-mongoose.connect('mongodb://localhost/NWJournalDB')
 
 const db = mongoose.connection
 
@@ -46,23 +56,23 @@ app.post('/add-account', (req, res) => {
 app.get('/get-valuations', (req, res) => {
     console.log("GETVALHIT")
     Valuation.find({}).sort('newDate')
-    .then(results => {
-        res.json(results)
-    })
-    .catch(error => {
-        console.log(error)
-    })
+        .then(results => {
+            res.json(results)
+        })
+        .catch(error => {
+            console.log(error)
+        })
 })
 
 //Get accounts with valuations
-app.get('/get-accounts', (req,res) => {
-    Account.find({}).sort('type').populate({path: 'valuations', options: { sort: { 'newDate': 1 } } })
-    .then(results => {
-        res.json(results)
-    })
-    .catch(error => {
-        console.log(error)
-    })
+app.get('/get-accounts', (req, res) => {
+    Account.find({}).sort('type').populate({ path: 'valuations', options: { sort: { 'newDate': 1 } } })
+        .then(results => {
+            res.json(results)
+        })
+        .catch(error => {
+            console.log(error)
+        })
 })
 
 //Edit account
@@ -120,7 +130,7 @@ app.put('/edit-valuation/:accountId', (req, res) => {
     console.log("EDIT VAL HIT")
     console.log("REQ & BODY!!!" + JSON.stringify(req.body))
     __object = req.body
-    let valuationToUpdate = {$and: [{"accountId": req.params.accountId}, {"newDate":__object.newDate}] }
+    let valuationToUpdate = { $and: [{ "accountId": req.params.accountId }, { "newDate": __object.newDate }] }
     console.log("VAL TO UPDATE" + JSON.stringify(valuationToUpdate))
     let update = {
         accountId: __object.accountId,
@@ -169,12 +179,12 @@ app.get('/get-journals', (req, res) => {
 app.delete('/delete-account/:accountId', (req, res) => {
     let accountToDelete = { "accountId": req.params.accountId }
     Account.findOneAndRemove(accountToDelete)
-    .then(removedAccount => {
-        res.json(removedAccount)
-    })
-    .catch(err => {
-        console.log(err);
-    })
+        .then(removedAccount => {
+            res.json(removedAccount)
+        })
+        .catch(err => {
+            console.log(err);
+        })
 })
 
 //Delete valuations
@@ -182,18 +192,15 @@ app.delete('/delete-valuations/:accountId', (req, res) => {
     console.log("DELETE VAL")
     let valuationToDelete = { "accountId": req.params.accountId }
     Valuation.remove(valuationToDelete)
-    .then(removedValuations => {
-        res.json(removedValuations)
-    })
-    .catch(err => {
-        console.log(err);
-    })
+        .then(removedValuations => {
+            res.json(removedValuations)
+        })
+        .catch(err => {
+            console.log(err);
+        })
 })
 
-//Link to build dir
-app.use(express.static(__dirname+'/frontend/public'));
-
 //Port 8080
-app.listen(PORT, ()=>{
+app.listen(PORT, () => {
     console.log("server listening on port", PORT);
 });
