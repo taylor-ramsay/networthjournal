@@ -35,8 +35,7 @@ class JournalEntryForm extends Component {
                     </form>
                 </div>
             </div>
-
-        );
+        )
     }
 }
 

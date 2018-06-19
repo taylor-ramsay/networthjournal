@@ -157,7 +157,7 @@ class JournalEntryList extends Component {
         if (monthlyJournal) {
             return (
                 <div>
-                    <h5>Net Worth Journal</h5>
+                    <h5>Journal</h5>
                     <a href="/journal-entry"><Link className="add-link" to="/journal-entry"> create new journal entry</Link></a>
                     <table>
                         <thead>

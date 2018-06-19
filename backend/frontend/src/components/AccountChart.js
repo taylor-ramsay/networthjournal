@@ -13,11 +13,9 @@ class AccountChart extends Component {
     }
 
     render() {
-        
         //Defining props
         let accounts = this.props.accounts
         let valuations = this.props.valuations
-
         //Creating chart data for all accounts
         let labelArr = []
         let datasetArr = []
@@ -32,7 +30,6 @@ class AccountChart extends Component {
                 dateArr.push(dates)
             }
         }
-
         //Find the earliest date and the last date and create an array of months within that range for x-axis
         if (dateArr.length) {
             let sortedDates = dateArr.sort()
@@ -49,19 +46,18 @@ class AccountChart extends Component {
         for (let i = 0; i < accounts.length; i++) {
             dataArr[i] = []
             xyDataArray[i] = []
-            let sortedXyDataArray = []
-            
-            let datasetObj = {   
+
+            let datasetObj = {
                 label: accounts[i].name,
                 fill: false,
                 lineTension: 0.1,
-                backgroundColor: accounts[i].type === 'Asset' ? '#71F6B3': '#EDABEA',
-                borderColor: accounts[i].type === 'Asset' ? '#35BC70': '#FF7D90',
+                backgroundColor: accounts[i].type === 'Asset' ? '#71F6B3' : '#EDABEA',
+                borderColor: accounts[i].type === 'Asset' ? '#35BC70' : '#FF7D90',
                 borderCapStyle: 'butt',
                 borderDash: [],
                 borderDashOffset: 0.0,
                 borderJoinStyle: 'miter',
-                pointBorderColor: accounts[i].type === 'Asset' ? '#35BC70': '#FF7D90',
+                pointBorderColor: accounts[i].type === 'Asset' ? '#35BC70' : '#FF7D90',
                 pointBackgroundColor: '#fff',
                 pointBorderWidth: 1,
                 pointHoverRadius: 5,
@@ -74,36 +70,34 @@ class AccountChart extends Component {
             }
             let valuationsSortedByDate = accounts[i].valuations
             for (let j = 0; j < valuationsSortedByDate.length; j++) {
-                if (valuationsSortedByDate[j] === valuationsSortedByDate[valuationsSortedByDate.length-1]) {
+                if (valuationsSortedByDate[j] === valuationsSortedByDate[valuationsSortedByDate.length - 1]) {
                     var xyData = {
-                        x: labelArr[labelArr.length-1],
-                        y: valuationsSortedByDate[valuationsSortedByDate.length-1].newBalance
+                        x: labelArr[labelArr.length - 1],
+                        y: valuationsSortedByDate[valuationsSortedByDate.length - 1].newBalance
                     }
                 }
-                    var xyData = {
-                        x: moment(valuationsSortedByDate[j].newDate).format("MM/YYYY"),
-                        y: accounts[i].valuations[j].newBalance
-                    }
-                    xyDataArray[i].push(xyData)
+                var xyData = {
+                    x: moment(valuationsSortedByDate[j].newDate).format("MM/YYYY"),
+                    y: accounts[i].valuations[j].newBalance
+                }
+                xyDataArray[i].push(xyData)
             }
             datasetArr.push(datasetObj)
-            sortedXyDataArray = xyDataArray[i].sort((a,b) => {
-                return Number(a['x'].split('/').join('')) - Number(b['x'].split('/').join(''));
-            })
         }
-        
         //Assign computed data to chart data
         const data = {
             labels: labelArr,
             datasets: datasetArr
         };
-
         //Chart options
         const options = {
             scales: {
                 yAxes: [{
                     ticks: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        callback: function(value, index, values) {
+                            return '$' + value;
+                        }
                     }
                 }],
                 xAxes: [{
@@ -114,7 +108,6 @@ class AccountChart extends Component {
                 }]
             }
         }
-
         return (
             <div>
                 <h5>Accounts Chart</h5>
@@ -122,7 +115,7 @@ class AccountChart extends Component {
                 <Line data={data} width={1000} height={800} options={options} />
             </div>
         );
-}
+    }
 }
 
 export default AccountChart;

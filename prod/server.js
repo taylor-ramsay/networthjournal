@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const path = require("path");
 Schema = mongoose.Schema;
 const express = require('express'),
     bodyParser = require('body-parser')
@@ -9,15 +10,20 @@ app.use(bodyParser.json())
 const PORT = process.env.PORT || 8080
 
 //CORS
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
-    next();
-});
+// app.use((req, res, next) => {
+//     res.header("Access-Control-Allow-Origin", "*");
+//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//     res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
+//     next();
+// });
 
 //Mongo DB
-mongoose.connect('mongodb://localhost/NWJournalDB')
+// mongoose.connect('mongodb://localhost/NWJournalDB')
+
+mongoose.connect(process.env.MONGODB_URI, function (error) {
+    if (error) console.error(error);
+    else console.log('mongo connected');
+});
 
 const db = mongoose.connection
 
@@ -192,6 +198,8 @@ app.delete('/delete-valuations/:accountId', (req, res) => {
 
 //Link to build dir
 app.use(express.static(__dirname+'/frontend/build'));
+
+app.get('*', (req, res) => res.sendFile(__dirname+'/frontend/build/index.html'));
 
 //Port 8080
 app.listen(PORT, ()=>{
