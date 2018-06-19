@@ -529,7 +529,9 @@ class App extends Component {
                   <Route path="/edit-account" render={(props) => { return <AccountForm propsFromParent={props} handleSubmit={this.handleSubmit} currentAccount={this.state.currentAccount} getCurrentAccount={this.getCurrentAccount} _id={this.state.currentAccount._id} balance={this.state.currentAccount.balance} name={this.state.currentAccount.name} type={this.state.currentAccount.type} subType={this.state.currentAccount.subType} date={this.state.currentAccount.date} timeStamp={this.state.currentAccount.timeStamp} handleNameChange={this.handleNameChange} handleBalanceChange={this.handleBalanceChange} handleTypeChange={this.handleTypeChange} handleSubtypeChange={this.handleSubtypeChange} handleDateChange={this.handleDateChange} /> }} />
                   <Route path="/journal-entry" render={() => { return <JournalEntryForm handleJournalSubmit={this.handleJournalSubmit} handleJournalEntryChange={this.handleJournalEntryChange} handleJournalEntryDateChange={this.handleJournalEntryDateChange} date={this.state.currentMonthlyJournal.date} entry={this.state.currentMonthlyJournal.entry} /> }} />
                   <div class="button-box">
+                  <div>
                   <label>Click on buttons below to expand</label>
+                  </div>
                     <button className="waves-effect waves-light btn-small" onClick={this.handleNetWorthChart}>NetWorth Chart</button>
                     <button className="waves-effect waves-light btn-small" onClick={this.handleAccountChart}>Accounts Chart</button>
                   </div>
