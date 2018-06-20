@@ -7,5 +7,5 @@ import {Router, Route} from 'react-router';
 import { HashRouter } from 'react-router-dom'
 
 
-ReactDOM.render(<HashRouter><Route path="/" component={App} /></HashRouter>, document.getElementById('app'));
+ReactDOM.render(<HashRouter><Route path="/" component={App} /></HashRouter>, document.getElementById('root'));
 registerServiceWorker();
