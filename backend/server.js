@@ -8,6 +8,7 @@ app.use(bodyParser.json())
 
 const PORT = process.env.PORT || 8080
 const dev = app.get('env') !== 'production'
+console.log(dev)
 
 const db = mongoose.connection
 
