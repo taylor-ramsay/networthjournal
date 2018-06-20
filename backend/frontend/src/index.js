@@ -3,8 +3,9 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
-import {Router, Route, hashHistory} from 'react-router';
+import {Router, Route} from 'react-router';
+import { HashRouter } from 'react-router-dom'
 
 
-ReactDOM.render(<Router history={hashHistory}><Route path="/" component={App} /></Router>, document.getElementById('app'));
+ReactDOM.render(<HashRouter><Route path="/" component={App} /></HashRouter>, document.getElementById('app'));
 registerServiceWorker();
