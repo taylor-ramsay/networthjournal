@@ -22,7 +22,7 @@ class JournalEntryList extends Component {
         for (let i = 0; i < accounts.length; i++) {
             for (let j = 0; j < accounts[i].valuations.length; j++) {
                 var dates = accounts[i].valuations[j].newDate
-                dateArr.push(dates)
+                dateArr.push(moment(dates).format("MMYYYY"))
             }
         }
 
@@ -35,7 +35,7 @@ class JournalEntryList extends Component {
             let ed = moment(earliestDate)
             let diffInMonths = ld.diff(ed, 'months');
             for (let i = 0; i < diffInMonths + 1; i++) {
-                labelArr.push(moment(earliestDate).add(i, 'months').format("MM/YYYY"))
+                labelArr.push(moment(earliestDate).add(i, 'months'))
             }
         }
 
@@ -54,11 +54,11 @@ class JournalEntryList extends Component {
             //Push account value by month into their respective arrays
             for (let j = 0; j < labelArr.length; j++) {
                 if (valuationsSortedByDate[currentVal]) {
-                    if (labelArr[j] == moment(valuationsSortedByDate[currentVal].newDate).format('MM/YYYY') && accounts[i].type === "Asset") {
+                    if (labelArr[j] == moment(valuationsSortedByDate[currentVal].newDate).format('MMYYYY') && accounts[i].type === "Asset") {
                         assetsArr[i].push(valuationsSortedByDate[currentVal].newBalance)
                         currentVal = currentVal + 1
                     }
-                    else if (labelArr[j] != moment(valuationsSortedByDate[currentVal].newDate).format('MM/YYYY') && accounts[i].type === "Asset") {
+                    else if (labelArr[j] != moment(valuationsSortedByDate[currentVal].newDate).format('MMYYYY') && accounts[i].type === "Asset") {
                         if (currentVal > 0) {
                             assetsArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
                         }
@@ -66,11 +66,11 @@ class JournalEntryList extends Component {
                             assetsArr[i].push(0)
                         }
                     }
-                    else if (labelArr[j] == moment(valuationsSortedByDate[currentVal].newDate).format('MM/YYYY') && accounts[i].type === "Liability") {
+                    else if (labelArr[j] == moment(valuationsSortedByDate[currentVal].newDate).format('MMYYYY') && accounts[i].type === "Liability") {
                         liabilitiesArr[i].push(valuationsSortedByDate[currentVal].newBalance)
                         currentVal = currentVal + 1
                     }
-                    else if (labelArr[j] != moment(valuationsSortedByDate[currentVal].newDate).format('MM/YYYY') && accounts[i].type === "Liability") {
+                    else if (labelArr[j] != moment(valuationsSortedByDate[currentVal].newDate).format('MMYYYY') && accounts[i].type === "Liability") {
                         if (valuationsSortedByDate.length >= 1) {
                             if (currentVal > 0) {
                                 liabilitiesArr[i].push(valuationsSortedByDate[currentVal - 1].newBalance)
@@ -134,7 +134,7 @@ class JournalEntryList extends Component {
 
         let journalsJSX = labelArr.map((label, i) => {
             for (let j = 0; j < monthlyJournal.length; j++) {
-                if (moment(monthlyJournal[j].date).format("MM/YYYY") == labelArr[i]) {
+                if (moment(monthlyJournal[j].date).format("MMYYYY") == labelArr[i]) {
                     var journalEntry = monthlyJournal[j].entry
                 }
             }
