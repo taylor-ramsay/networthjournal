@@ -177,7 +177,7 @@ app.delete('/delete-valuations/:accountId', (req, res) => {
 })
 
 
-// if (!dev) {
+if (!dev) {
     app.disable('x-powered-by')
     app.use(express.static(__dirname + '/frontend/build'));
     // app.get('*', (req, res) => {
@@ -186,19 +186,19 @@ app.delete('/delete-valuations/:accountId', (req, res) => {
     app.get('*', (req, res) => res.sendFile(__dirname + '/frontend/build/index.html'));
     mongoose.connect('mongodb://localhost/NWJournalDB')
     //mongoose.connect(process.env.MONGODB_URI)
-// }
+}
 
-// if (dev) {
-//     app.use(express.static(__dirname + '/frontend/public'));
-//     mongoose.connect('mongodb://localhost/NWJournalDB')
-//     //CORS
-//     app.use((req, res, next) => {
-//         res.header("Access-Control-Allow-Origin", "*");
-//         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-//         res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
-//         next();
-//     });
-// }
+if (dev) {
+    app.use(express.static(__dirname + '/frontend/public'));
+    mongoose.connect('mongodb://localhost/NWJournalDB')
+    //CORS
+    app.use((req, res, next) => {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
+        next();
+    });
+}
 
 //Port 8080
 app.listen(PORT, () => {
