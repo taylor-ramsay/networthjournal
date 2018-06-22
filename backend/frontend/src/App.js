@@ -126,6 +126,32 @@ class App extends Component {
     }, () => { window.initMaterialize() })
   }
 
+  editJournalHandler = (journalDate) => {
+    console.log("EJ HIT")
+
+    for (let i = 0; i < this.state.monthlyJournal; i++) {
+      if (journalDate === this.state.monthlyJournal[i]) {
+        this.setState({
+          currentMonthlyJournal: this.state.monthlyJournal[i]
+        }, () => {
+          window.initMaterialize()
+        })
+      }
+      else {
+        this.setState({
+          currentMonthlyJournal: {
+            entry: "",
+            date: journalDate,
+            timeStamp: "",
+            journalId: uniqid()
+          }
+        }, () => {
+          window.initMaterialize()
+        })
+      }
+    }
+  }
+
   addButtonHandler = (e) => {
     this.setState({
       currentAccount: {
@@ -515,12 +541,12 @@ class App extends Component {
                   <Route path="/" render={() => { return <JournalEntryList monthlyJournal={this.state.monthlyJournal} accounts={this.state.accounts} valuations={this.state.valuations} /> }} />
                 </div>
                 <div className="col s4">
-                    
+
                   <Route path="/add-account" render={(props) => { return <AccountForm propsFromParent={props} handleSubmit={this.handleSubmit} currentAccount={this.state.currentAccount} getCurrentAccount={this.getCurrentAccount} _id={this.state.currentAccount._id} balance={this.state.currentAccount.balance} name={this.state.currentAccount.name} type={this.state.currentAccount.type} subType={this.state.currentAccount.subType} date={this.state.currentAccount.date} timeStamp={this.state.currentAccount.timeStamp} handleNameChange={this.handleNameChange} handleBalanceChange={this.handleBalanceChange} handleTypeChange={this.handleTypeChange} handleSubtypeChange={this.handleSubtypeChange} handleDateChange={this.handleDateChange} /> }} />
                   <Route path="/edit-account" render={(props) => { return <AccountForm propsFromParent={props} handleSubmit={this.handleSubmit} currentAccount={this.state.currentAccount} getCurrentAccount={this.getCurrentAccount} _id={this.state.currentAccount._id} balance={this.state.currentAccount.balance} name={this.state.currentAccount.name} type={this.state.currentAccount.type} subType={this.state.currentAccount.subType} date={this.state.currentAccount.date} timeStamp={this.state.currentAccount.timeStamp} handleNameChange={this.handleNameChange} handleBalanceChange={this.handleBalanceChange} handleTypeChange={this.handleTypeChange} handleSubtypeChange={this.handleSubtypeChange} handleDateChange={this.handleDateChange} /> }} />
                   <Route path="/journal-entry" render={() => { return <JournalEntryForm handleJournalSubmit={this.handleJournalSubmit} handleJournalEntryChange={this.handleJournalEntryChange} handleJournalEntryDateChange={this.handleJournalEntryDateChange} date={this.state.currentMonthlyJournal.date} entry={this.state.currentMonthlyJournal.entry} /> }} />
-                  </div>
-         
+                </div>
+
               </MediaQuery>
               <MediaQuery query="(max-width: 992px)">
                 <div className="col s12">
@@ -529,15 +555,15 @@ class App extends Component {
                   <Route path="/edit-account" render={(props) => { return <AccountForm propsFromParent={props} handleSubmit={this.handleSubmit} currentAccount={this.state.currentAccount} getCurrentAccount={this.getCurrentAccount} _id={this.state.currentAccount._id} balance={this.state.currentAccount.balance} name={this.state.currentAccount.name} type={this.state.currentAccount.type} subType={this.state.currentAccount.subType} date={this.state.currentAccount.date} timeStamp={this.state.currentAccount.timeStamp} handleNameChange={this.handleNameChange} handleBalanceChange={this.handleBalanceChange} handleTypeChange={this.handleTypeChange} handleSubtypeChange={this.handleSubtypeChange} handleDateChange={this.handleDateChange} /> }} />
                   <Route path="/journal-entry" render={() => { return <JournalEntryForm handleJournalSubmit={this.handleJournalSubmit} handleJournalEntryChange={this.handleJournalEntryChange} handleJournalEntryDateChange={this.handleJournalEntryDateChange} date={this.state.currentMonthlyJournal.date} entry={this.state.currentMonthlyJournal.entry} /> }} />
                   <div class="button-box">
-                  <div>
-                  <label>Click on buttons below to expand</label>
-                  </div>
+                    <div>
+                      <label>Click on buttons below to expand</label>
+                    </div>
                     <button className="waves-effect waves-light btn-small" onClick={this.handleNetWorthChart}>NetWorth Chart</button>
                     <button className="waves-effect waves-light btn-small" onClick={this.handleAccountChart}>Accounts Chart</button>
                   </div>
                   {this.state.accountChart.active && <Route path="/" render={() => { return <AccountChart accounts={this.state.accounts} valuations={this.state.valuations} /> }} />}
                   {this.state.netWorthChart.active && <Route path="/" render={() => { return <NetWorthChart accounts={this.state.accounts} valuations={this.state.valuations} /> }} />}
-                  <Route path="/" render={() => { return <JournalEntryList monthlyJournal={this.state.monthlyJournal} accounts={this.state.accounts} valuations={this.state.valuations} /> }} />
+                  <Route path="/" render={() => { return <JournalEntryList editJournalHandler={this.editJournalHandler} monthlyJournal={this.state.monthlyJournal} accounts={this.state.accounts} valuations={this.state.valuations} /> }} />
                 </div>
               </MediaQuery>
             </div>

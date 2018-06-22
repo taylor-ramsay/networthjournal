@@ -176,19 +176,16 @@ app.delete('/delete-valuations/:accountId', (req, res) => {
         })
 })
 
-
 if (!dev) {
+    console.log('Production')
     app.disable('x-powered-by')
     app.use(express.static(__dirname + '/frontend/build'));
-    // app.get('*', (req, res) => {
-    //     res.sendFile('index.html',{root: __dirname + '/frontend/build/index.html'});
-    // });
     app.get('*', (req, res) => res.sendFile(__dirname + '/frontend/build/index.html'));
     mongoose.connect('mongodb://localhost/NWJournalDB')
-    //mongoose.connect(process.env.MONGODB_URI)
 }
 
 if (dev) {
+    console.log('Development')
     app.use(express.static(__dirname + '/frontend/public'));
     mongoose.connect('mongodb://localhost/NWJournalDB')
     //CORS

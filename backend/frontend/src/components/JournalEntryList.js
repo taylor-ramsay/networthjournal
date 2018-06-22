@@ -7,6 +7,8 @@ class JournalEntryList extends Component {
 
     render() {
 
+        console.log(this.props)
+
         //Defining props
         let monthlyJournal = this.props.monthlyJournal
         let accounts = this.props.accounts
@@ -147,7 +149,9 @@ class JournalEntryList extends Component {
             return (
                 <tr>
                     <td>{labelArr[i]}</td>
-                    <td>{journalEntry}</td>
+                    <td>{journalEntry} 
+                    {/* <Link to="/journal-entry" className="secondary-content" className="edit-link" onClick={() => { this.props.editJournalHandler(labelArr[i]) }}>edit</Link> */}
+                    </td>
                     <td>${netWorthByMonth[i]}.00</td>
                     <td className={changeInNetWorth === 0 ? '' : changeInNetWorth > 0 ? "asset" : "liability"}>{parseFloat(changeInNetWorth).toFixed(0)}%</td>
                 </tr>

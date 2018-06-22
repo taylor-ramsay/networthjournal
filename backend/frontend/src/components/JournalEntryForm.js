@@ -4,10 +4,11 @@ import moment from 'moment'
 class JournalEntryForm extends Component {
 
     componentDidMount(){
-        //window.initMaterialize()
+        window.initMaterialize()
     }
 
     render() {
+        console.log(this.props)
         return (
             <div onClick={(e) => { this.props.handleJournalEntryDateChange(e) }}>
                 <h4>Record Journal Entry</h4>
